@@ -199,6 +199,71 @@
   section[id],div[id] { scroll-margin-top:84px; }
 }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; scroll-behavior:auto!important; } }
+        /* Selected Projects grid */
+#projects > .w3-row-padding {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 16px;
+}
+
+#projects > .w3-row-padding::before,
+#projects > .w3-row-padding::after {
+  display: none;
+}
+
+#projects > .w3-row-padding > .w3-col {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  margin-bottom: 0 !important;
+}
+
+#projects .project-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#projects .project-img,
+#projects .project-cover {
+  display: block;
+  width: 100%;
+  height: 145px;
+  min-height: 145px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+#projects .project-cover {
+  display: grid;
+  place-items: center;
+}
+
+#projects .project-card > .w3-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 8px 16px !important;
+}
+
+#projects .project-card > .w3-container > p:last-child {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+@media (max-width: 992px) {
+  #projects > .w3-row-padding {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  #projects > .w3-row-padding {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 <body>
@@ -231,7 +296,13 @@
 
   <div class="w3-container w3-padding-64" id="about">
     <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">About Me</h3>
-    <p>I am a passionate <b>Frontend Developer</b> dedicated to building responsive, user-centric web applications. With a focus on clean code and interactive design, I transform complex problems into elegant digital experiences.</p>
+  <p>
+  I’m Hevine Salloum, a front-end developer who builds responsive websites,
+  online stores, and admin dashboards using HTML, CSS, and JavaScript.
+  During my 40-day internship, I put those skills into practice. One of my
+  featured projects is Daniella’s Home, a home décor store with product
+  categories, a shopping cart, and WhatsApp ordering.
+</p>
   </div>
 
   <div class="w3-container w3-padding-32" id="skills">
@@ -243,6 +314,25 @@
         <div class="tech-box"><i class="fa fa-mobile fa-3x"></i><p>Responsive</p></div>
         <div class="tech-box"><i class="fa fa-github fa-3x"></i><p>GitHub</p></div>
         <div class="tech-box"><i class="fa fa-paint-brush fa-3x"></i><p>UI/UX</p></div>
+        <div class="tech-box">
+  <i class="fa fa-database fa-3x" aria-hidden="true"></i>
+  <p>Supabase</p>
+</div>
+
+<div class="tech-box">
+  <i class="fa fa-fire fa-3x" aria-hidden="true"></i>
+  <p>Firebase</p>
+</div>
+
+<div class="tech-box">
+  <i class="fa fa-plug fa-3x" aria-hidden="true"></i>
+  <p>REST APIs</p>
+</div>
+
+<div class="tech-box">
+  <i class="fa fa-cloud-upload fa-3x" aria-hidden="true"></i>
+  <p>Vercel</p>
+</div>
     </div>
   </div>
 
