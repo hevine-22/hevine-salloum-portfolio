@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunrise Animation</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #111;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* Scene Container */
+    .sky {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      height: 500px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      
+      /* Animate Sky Gradient Background */
+      animation: skySunrise 10s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
+
+    /* Sun */
+    .sun {
+      position: absolute;
+      left: 50%;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, #fff 20%, #ffd700 60%, #ff8c00 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 40px #ff8c00, 0 0 80px #ff4500;
+      
+      /* Animate Sun Position and Glow Scale */
+      animation: sunRise 10s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
+
+    /* Distant Mountains / Horizon Silhouette */
+    .mountains {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 160px;
+      fill: #1a0f2e;
+      z-index: 2;
+      animation: mountainColor 10s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
+
+    /* Foreground Hills Silhouette */
+    .hills {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 100px;
+      fill: #0d0618;
+      z-index: 3;
+      animation: hillColor 10s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
+
+    /* --- Keyframe Animations --- */
+
+    /* 1. Sky Color Transition */
+    @keyframes skySunrise {
+      0% {
+        /* Pre-dawn / Night */
+        background-color: #0b0d1b;
+      }
+      30% {
+        /* Early dawn glow at horizon */
+        background: linear-gradient(to top, #4a154b 0%, #191938 60%, #0b0d1b 100%);
+      }
+      60% {
+        /* Golden Hour transition */
+        background: linear-gradient(to top, #ff7e5f 0%, #feb47b 40%, #6a3093 80%, #191938 100%);
+      }
+      100% {
+        /* Fully Risen Bright Sky */
+        background: linear-gradient(to top, #ffbe76 0%, #ff7979 30%, #48dbfb 70%, #2e86de 100%);
+      }
+    }
+
+    /* 2. Sun Movement and Intensity */
+    @keyframes sunRise {
+      0% {
+        transform: translate(-50%, 350px) scale(0.8);
+        box-shadow: 0 0 20px #ff3300, 0 0 40px #aa0000;
+        filter: opacity(0.5);
+      }
+      25% {
+        filter: opacity(0.9);
+      }
+      100% {
+        transform: translate(-50%, 120px) scale(1.1);
+        box-shadow: 0 0 60px #ffeaa7, 0 0 120px #fdcb6e, 0 0 180px #ff7675;
+        filter: opacity(1);
+      }
+    }
+
+    /* 3. Dynamic ambient lighting on landscape */
+    @keyframes mountainColor {
+      0% { fill: #0b0713; }
+      100% { fill: #482142; }
+    }
+
+    @keyframes hillColor {
+      0% { fill: #050308; }
+      100% { fill: #240d21; }
+    }
+  @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-play-state: paused !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sky">
+    <!-- Sun -->
+    <div class="sun"></div>
+
+    <!-- Mountain Layer SVG -->
+    <svg class="mountains" viewBox="0 0 1200 320" preserveAspectRatio="none">
+      <path d="M0,320 L0,180 L180,90 L380,240 L550,110 L750,220 L920,80 L1200,260 L1200,320 Z"></path>
+    </svg>
+
+    <!-- Hill Layer SVG -->
+    <svg class="hills" viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <path d="M0,200 L0,120 Q300,40 600,120 T1200,80 L1200,200 Z"></path>
+    </svg>
+  </div>
+
+</body>
+</html>

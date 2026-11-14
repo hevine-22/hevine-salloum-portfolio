@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Hevine Salloum | Frontend Developer Portfolio</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        :root {
+            --accent-color: #00d4ff;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --text-light: #f8fafc;
+            --transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            scroll-behavior: smooth;
+            margin: 0;
+        }
+
+        /* Navbar Customization */
+        .w3-top { z-index: 1000; }
+        .nav-glass {
+            background: rgba(15, 23, 42, 0.8) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Hero Section */
+        header#home {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            padding: 0 20px;
+        }
+
+        /* Typewriter Effect Styles */
+        #typewriter-container {
+            min-height: 1.5em; /* Prevents layout jump */
+        }
+
+        .typewriter-text {
+            color: var(--accent-color);
+            border-right: 3px solid var(--accent-color);
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2.5vw;
+            min-font-size: 18px;
+            animation: blink-cursor 0.75s step-end infinite;
+        }
+
+        @keyframes blink-cursor {
+            from, to { border-color: transparent; }
+            50% { border-color: var(--accent-color); }
+        }
+
+        @media (max-width: 600px) {
+            .typewriter-text {
+                font-size: 1.2rem;
+                white-space: normal;
+                border-right: none;
+            }
+        }
+
+        /* Neon View Work Button */
+        .btn-view-work {
+            display: inline-block;
+            padding: 12px 30px;
+            background: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.4s ease;
+            margin-top: 20px;
+        }
+
+        .btn-view-work:hover {
+            background: var(--accent-color);
+            color: #0f172a;
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6), 
+                        0 0 40px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Skills/Tech Stack */
+        .tech-stack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+        }
+
+        .tech-box {
+            background: var(--card-bg);
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+        }
+
+        .tech-box:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-color);
+        }
+
+        /* Glassmorphism Projects */
+        .project-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            height: 100%;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--accent-color);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .project-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+            transition: 0.4s ease;
+        }
+
+        .project-card:hover .project-img {
+            opacity: 1;
+        }
+
+        .project-card h4 {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* Contact Form */
+        input, textarea {
+            background: #1e293b !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            color: white !important;
+            border-radius: 8px !important;
+        }
+
+        .btn-submit {
+            background: var(--accent-color) !important;
+            color: #0f172a !important;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-submit:hover {
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+
+        /* Scroll Top Button */
+        #scrollTop {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            background: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 99;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    
+.project-cover { min-height: 145px; display:grid; place-items:center; font-size:3rem; color:#e2f8f5; background:linear-gradient(140deg,#193247,#236960); }
+.cover-shopping-basket,.cover-sun-o,.cover-spinner { background:linear-gradient(140deg,#553557,#97594b); }
+.cover-map-o,.cover-list-alt,.cover-exchange { background:linear-gradient(140deg,#243761,#4b4d92); }
+@media(max-width:600px) {
+  .portfolio-nav { float:none!important; clear:both; display:flex; flex-wrap:wrap; }
+  .portfolio-nav .w3-button { padding:7px 11px; }
+  section[id],div[id] { scroll-margin-top:84px; }
+}
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; scroll-behavior:auto!important; } }
+</style>
+</head>
+<body>
+
+<div class="w3-top">
+  <div class="w3-bar w3-wide w3-padding nav-glass">
+    <a href="#home" class="w3-bar-item w3-button w3-text-white"><b>HEVINE</b>.dev</a>
+    <div class="w3-right portfolio-nav">
+      <a href="#about" class="w3-bar-item w3-button">About</a>
+      <a href="#skills" class="w3-bar-item w3-button">Skills</a>
+      <a href="#projects" class="w3-bar-item w3-button">Projects</a>
+      <a href="#contact" class="w3-bar-item w3-button">Contact</a>
+    </div>
+  </div>
+</div>
+
+<header id="home">
+  <div class="w3-center">
+    <h1 class="w3-xxxlarge">Hi, I'm <span style="color:var(--accent-color)">Hevine Salloum</span></h1>
+    <div id="typewriter-container">
+        <h2 class="w3-large"><span id="typewriter" class="typewriter-text"></span></h2>
+    </div>
+    <div class="w3-padding-32">
+        <a href="#projects" class="btn-view-work">View My Work</a>
+    </div>
+  </div>
+</header>
+
+<div class="w3-content w3-padding" style="max-width:1100px">
+
+  <div class="w3-container w3-padding-64" id="about">
+    <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">About Me</h3>
+    <p>I am a passionate <b>Frontend Developer</b> dedicated to building responsive, user-centric web applications. With a focus on clean code and interactive design, I transform complex problems into elegant digital experiences.</p>
+  </div>
+
+  <div class="w3-container w3-padding-32" id="skills">
+    <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Tech Stack</h3>
+    <div class="tech-stack-grid w3-margin-top">
+        <div class="tech-box"><i class="fa fa-html5 fa-3x"></i><p>HTML5</p></div>
+        <div class="tech-box"><i class="fa fa-css3 fa-3x"></i><p>CSS3</p></div>
+        <div class="tech-box"><i class="fa fa-code fa-3x"></i><p>JavaScript</p></div>
+        <div class="tech-box"><i class="fa fa-mobile fa-3x"></i><p>Responsive</p></div>
+        <div class="tech-box"><i class="fa fa-github fa-3x"></i><p>GitHub</p></div>
+        <div class="tech-box"><i class="fa fa-paint-brush fa-3x"></i><p>UI/UX</p></div>
+    </div>
+  </div>
+
+  <div class="w3-container w3-padding-64" id="projects">
+    <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Selected Projects</h3>
+    <div class="w3-row-padding w3-margin-top">
+      
+      <div class="w3-col l4 m6 w3-margin-bottom">
+        <div class="project-card">
+          <div class="project-cover cover-shopping-basket" aria-hidden="true"><i class="fa fa-shopping-basket"></i></div>
+          <div class="w3-container w3-padding">
+            <h4>Al-Sajj Bakery</h4>
+            <p class="w3-opacity">The Sajj Society </p>
+            <p><a href="projects/lebanese_sajj_bakery_online_ordering.html" target="_blank" rel="noopener" class="w3-button w3-block w3-dark-grey w3-round">View Project</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-col l4 m6 w3-margin-bottom">
+        <div class="project-card">
+          <div class="project-cover cover-globe" aria-hidden="true"><i class="fa fa-globe"></i></div>
+          <div class="w3-container w3-padding">
+            <h4>City Explorer</h4>
+            <p class="w3-opacity">Finding City Informations </p>
+            <p><a href="projects/city_explorer_web_application.html" target="_blank" rel="noopener" class="w3-button w3-block w3-dark-grey w3-round">View Project</a></p>
+          </div>
+        </div>
+      </div>
+   
+       <div class="w3-col l4 m6 w3-margin-bottom">
+        <div class="project-card">
+          <div class="project-cover cover-check-square-o" aria-hidden="true"><i class="fa fa-check-square-o"></i></div>
+          <div class="w3-container w3-padding">
+            <h4 style="color:var(--accent-color)">AuraTask</h4>
+            <p class="w3-opacity">Task Management</p>
+            <p><a href="projects/futuristic_glassmorphic_to_do_list.html" target="_blank" rel="noopener" class="w3-button w3-block w3-dark-grey w3-round">View Project</a></p>
+          </div>
+        </div>
+      </div>
+        <div class="w3-col l4 m6 w3-margin-bottom">
+        <div class="project-card">
+          <div class="project-cover cover-list-alt" aria-hidden="true"><i class="fa fa-list-alt"></i></div>
+          <div class="w3-container w3-padding">
+            <h4 style="color:var(--accent-color)">Student Registration</h4>
+            <p class="w3-opacity">Studet Registration Form</p>
+            <p><a href="projects/student_registration_form.html" target="_blank" rel="noopener" class="w3-button w3-block w3-dark-grey w3-round">View Project</a></p>
+          </div>
+        </div>
+      </div>
+              <div class="w3-col l4 m6 w3-margin-bottom">
+        <div class="project-card">
+          <div class="project-cover cover-spinner" aria-hidden="true"><i class="fa fa-spinner"></i></div>
+          <div class="w3-container w3-padding">
+            <h4 style="color:var(--accent-color)">Preloader Playground</h4>
+            <p class="w3-opacity">Preloader Web Page</p>
+            <p><a href="projects/cute_cool_preloader_experience.html" target="_blank" rel="noopener" class="w3-button w3-block w3-dark-grey w3-round">View Project</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-col l4 m6 w3-margin-bottom">
+        <div class="project-card">
+          <div class="project-cover cover-cloud" aria-hidden="true"><i class="fa fa-cloud"></i></div>
+          <div class="w3-container w3-padding">
+            <h4>Weather App</h4>
+            <p class="w3-opacity">Weather Around The World </p>
+            <p><a href="projects/weather-app.html" target="_blank" rel="noopener" class="w3-button w3-block w3-dark-grey w3-round">View Project</a></p>
+          </div>
+        </div>
+      </div>
+       <div class="w3-col l4 m6 w3-margin-bottom">
+        <div class="project-card">
+          <div class="project-cover cover-map-o" aria-hidden="true"><i class="fa fa-map-o"></i></div>
+          <div class="w3-container w3-padding">
+            <h4 style="color:var(--accent-color)">Tokyo Explorer Guide</h4>
+            <p class="w3-opacity">South Korea Overview</p>
+            <p><a href="projects/tokyo_explorer_guide.html" target="_blank" rel="noopener" class="w3-button w3-block w3-dark-grey w3-round">View Project</a></p>
+          </div>
+        </div>
+      </div>
+        <div class="w3-col l4 m6 w3-margin-bottom">
+        <div class="project-card">
+          <div class="project-cover cover-sun-o" aria-hidden="true"><i class="fa fa-sun-o"></i></div>
+          <div class="w3-container w3-padding">
+            <h4>Sunrise Animation</h4>
+            <p class="w3-opacity">SunRise Web Page </p>
+            <p><a href="projects/interactive_sunrise_animation.html" target="_blank" rel="noopener" class="w3-button w3-block w3-dark-grey w3-round">View Project</a></p>
+          </div>
+        </div>
+      </div>
+      <div class="w3-col l4 m6 w3-margin-bottom">
+        <div class="project-card">
+          <div class="project-cover cover-exchange" aria-hidden="true"><i class="fa fa-exchange"></i></div>
+          <div class="w3-container w3-padding">
+            <h4>Foreign Exchange</h4>
+            <p class="w3-opacity">Currency Converter </p>
+            <p><a href="projects/foreign-exchange.html" target="_blank" rel="noopener" class="w3-button w3-block w3-dark-grey w3-round">View Project</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w3-container w3-padding-64" id="contact">
+    <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Let's Connect</h3>
+    <div class="w3-row">
+        <div class="w3-col m6 w3-padding-large">
+            <p><i class="fa fa-map-marker fa-fw w3-margin-right w3-text-teal"></i> Beqaa, Lebanon</p>
+            <p><i class="fa fa-envelope fa-fw w3-margin-right w3-text-teal"></i> <a href="mailto:salloumhevine01@gmail.com">salloumhevine01@gmail.com</a></p>
+            <p><i class="fa fa-github fa-fw w3-margin-right w3-text-teal"></i> <a href="https://github.com/hevine-22">github.com/hevine-22</a></p>
+        </div>
+        
+    </div>
+  </div>
+</div>
+
+<button onclick="topFunction()" id="scrollTop" title="Go to top"><i class="fa fa-arrow-up"></i></button>
+
+<footer class="w3-center w3-padding-32 w3-dark-grey">
+  <p>&copy; 2026 Hevine Salloum | Built with Passion & Code</p>
+</footer>
+
+<script>
+    // 1. Improved Typewriter Effect
+    const text = "Frontend Developer | UI/UX Enthusiast | Problem Solver";
+    let i = 0;
+    const speed = 100;
+
+    function typeWriter() {
+        const target = document.getElementById("typewriter");
+        if (i < text.length) {
+            target.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(typeWriter, speed + (Math.random() * 40));
+        } else {
+            // After typing, allow wrapping for responsive design
+            target.style.whiteSpace = "normal";
+        }
+    }
+
+    // 2. Scroll to Top Logic
+    let mybutton = document.getElementById("scrollTop");
+    window.onscroll = function() {scrollFunction()};
+
+    function scrollFunction() {
+        if (document.body.scrollTop > 400 || document.documentElement.scrollTop > 400) {
+            mybutton.style.display = "block";
+        } else {
+            mybutton.style.display = "none";
+        }
+    }
+
+    function topFunction() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    // Initialize
+    window.onload = () => {
+        setTimeout(typeWriter, 800);
+    };
+</script>
+
+</body>
+</html>

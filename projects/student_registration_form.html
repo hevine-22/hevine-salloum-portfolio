@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Registration Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printable-area, #printable-area * {
+        visibility: visible;
+      }
+      #printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+        box-shadow: none;
+        border: none;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between antialiased">
+
+  <header class="bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-800 text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
+          <i class="fa-solid fa-graduation-cap text-3xl"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight">Academic Portal</h1>
+          <p class="text-brand-100 text-sm">Student Registration & Enrollment</p>
+        </div>
+      </div>
+      <div class="text-xs sm:text-sm bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/20">
+        <i class="fa-regular fa-calendar-check mr-1"></i> Academic Term 2026 - 2027
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-8 w-full flex-grow">
+    <!-- Stepper Navigation -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center relative max-w-2xl mx-auto">
+        <!-- Connecting Line -->
+        <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-slate-200 w-full -z-0 rounded"></div>
+        <div id="progress-line" class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-600 w-0 -z-0 rounded transition-all duration-300"></div>
+
+        <!-- Step 1 Indicator -->
+        <div class="step-indicator flex flex-col items-center z-10" data-step="1">
+          <div class="step-circle w-10 h-10 rounded-full bg-brand-600 text-white font-semibold flex items-center justify-center shadow-md transition-all">
+            1
+          </div>
+          <span class="text-xs font-medium mt-2 text-brand-600">Personal</span>
+        </div>
+
+        <!-- Step 2 Indicator -->
+        <div class="step-indicator flex flex-col items-center z-10" data-step="2">
+          <div class="step-circle w-10 h-10 rounded-full bg-slate-200 text-slate-600 font-semibold flex items-center justify-center transition-all">
+            2
+          </div>
+          <span class="text-xs font-medium mt-2 text-slate-500">Academic</span>
+        </div>
+
+        <!-- Step 3 Indicator -->
+        <div class="step-indicator flex flex-col items-center z-10" data-step="3">
+          <div class="step-circle w-10 h-10 rounded-full bg-slate-200 text-slate-600 font-semibold flex items-center justify-center transition-all">
+            3
+          </div>
+          <span class="text-xs font-medium mt-2 text-slate-500">Emergency</span>
+        </div>
+
+        <!-- Step 4 Indicator -->
+        <div class="step-indicator flex flex-col items-center z-10" data-step="4">
+          <div class="step-circle w-10 h-10 rounded-full bg-slate-200 text-slate-600 font-semibold flex items-center justify-center transition-all">
+            4
+          </div>
+          <span class="text-xs font-medium mt-2 text-slate-500">Review</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+      <form id="registrationForm" class="p-6 sm:p-10" novalidate>
+        <p class="mb-4 text-sm text-slate-600">Portfolio demo. Use sample details. Entries stay on this page.</p>
+        
+        <!-- ==================== STEP 1: Personal Information ==================== -->
+        <div class="form-step transition-opacity duration-300" id="step-1">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-user text-brand-600"></i> Personal Information
+            </h2>
+            <p class="text-sm text-slate-500">Please provide your official identification details.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Full Name -->
+            <div class="md:col-span-2">
+              <label for="fullName" class="block text-sm font-semibold text-slate-700 mb-1">Full Name *</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <i class="fa-regular fa-user"></i>
+                </span>
+                <input type="text" id="fullName" name="fullName" placeholder="John Doe" 
+                  class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+              </div>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+
+            <!-- Date of Birth -->
+            <div>
+              <label for="dob" class="block text-sm font-semibold text-slate-700 mb-1">Date of Birth *</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <i class="fa-regular fa-calendar"></i>
+                </span>
+                <input type="date" id="dob" name="dob" 
+                  class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+              </div>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+
+            <!-- Gender -->
+            <div>
+              <label for="gender" class="block text-sm font-semibold text-slate-700 mb-1">Gender *</label>
+              <select id="gender" name="gender" 
+                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none bg-white">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+
+            <!-- Email Address -->
+            <div>
+              <label for="email" class="block text-sm font-semibold text-slate-700 mb-1">Email Address *</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <i class="fa-regular fa-envelope"></i>
+                </span>
+                <input type="email" id="email" name="email" placeholder="student@example.com" 
+                  class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+              </div>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+
+            <!-- Phone Number -->
+            <div>
+              <label for="phone" class="block text-sm font-semibold text-slate-700 mb-1">Phone Number *</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <i class="fa-solid fa-phone-volume text-xs"></i>
+                </span>
+                <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000" 
+                  class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+              </div>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STEP 2: Academic Information ==================== -->
+        <div class="form-step transition-opacity duration-300 hidden" id="step-2">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-book-open text-brand-600"></i> Academic Information
+            </h2>
+            <p class="text-sm text-slate-500">Provide details about your intended major and educational background.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Student/National ID -->
+            <div>
+              <label for="studentId" class="block text-sm font-semibold text-slate-700 mb-1">
+                Student ID / National ID <span class="text-slate-400 font-normal">(Optional)</span>
+              </label>
+              <input type="text" id="studentId" name="studentId" placeholder="e.g. ST-98765" 
+                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+            </div>
+
+            <!-- Grade / Academic Level -->
+            <div>
+              <label for="academicLevel" class="block text-sm font-semibold text-slate-700 mb-1">Academic Level *</label>
+              <select id="academicLevel" name="academicLevel" 
+                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none bg-white">
+                <option value="">Select Level</option>
+                <option value="Freshman">Freshman</option>
+                <option value="Sophomore">Sophomore</option>
+                <option value="Junior">Junior</option>
+                <option value="Senior">Senior</option>
+                <option value="Graduate">Graduate</option>
+              </select>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+
+            <!-- Course / Major Selection -->
+            <div>
+              <label for="major" class="block text-sm font-semibold text-slate-700 mb-1">Course / Major Selection *</label>
+              <select id="major" name="major" 
+                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none bg-white">
+                <option value="">Select Major</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                <option value="Biotechnology">Biotechnology</option>
+                <option value="Graphic Design">Graphic Design</option>
+                <option value="Psychology">Psychology</option>
+              </select>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+
+            <!-- Semester / Term -->
+            <div>
+              <label for="semester" class="block text-sm font-semibold text-slate-700 mb-1">Semester / Term *</label>
+              <select id="semester" name="semester" 
+                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none bg-white">
+                <option value="">Select Term</option>
+                <option value="Fall 2026">Fall 2026</option>
+                <option value="Spring 2027">Spring 2027</option>
+                <option value="Summer 2027">Summer 2027</option>
+              </select>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STEP 3: Emergency Contact ==================== -->
+        <div class="form-step transition-opacity duration-300 hidden" id="step-3">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-address-book text-brand-600"></i> Emergency Contact & Location
+            </h2>
+            <p class="text-sm text-slate-500">Contact person in case of urgent situations and your primary address.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Contact Person Name -->
+            <div>
+              <label for="emergencyName" class="block text-sm font-semibold text-slate-700 mb-1">Emergency Contact Person *</label>
+              <input type="text" id="emergencyName" name="emergencyName" placeholder="Jane Doe" 
+                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+
+            <!-- Relationship -->
+            <div>
+              <label for="relationship" class="block text-sm font-semibold text-slate-700 mb-1">Relationship *</label>
+              <select id="relationship" name="relationship" 
+                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none bg-white">
+                <option value="">Select Relationship</option>
+                <option value="Parent">Parent</option>
+                <option value="Guardian">Guardian</option>
+                <option value="Spouse">Spouse</option>
+                <option value="Sibling">Sibling</option>
+                <option value="Other">Other</option>
+              </select>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+
+            <!-- Emergency Contact Phone -->
+            <div class="md:col-span-2">
+              <label for="emergencyPhone" class="block text-sm font-semibold text-slate-700 mb-1">Emergency Phone Number *</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <i class="fa-solid fa-phone text-xs"></i>
+                </span>
+                <input type="tel" id="emergencyPhone" name="emergencyPhone" placeholder="+1 (555) 000-0000" 
+                  class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+              </div>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+
+            <!-- Address Lines -->
+            <div class="md:col-span-2 border-t border-slate-100 pt-4">
+              <h3 class="font-semibold text-slate-700 mb-3 text-sm">Residential Address *</h3>
+              <div class="space-y-4">
+                <div>
+                  <input type="text" id="street" name="street" placeholder="Street Address" 
+                    class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+                  <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <input type="text" id="city" name="city" placeholder="City" 
+                      class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+                    <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+                  </div>
+                  <div>
+                    <input type="text" id="state" name="state" placeholder="State/Province" 
+                      class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+                    <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+                  </div>
+                  <div>
+                    <input type="text" id="postalCode" name="postalCode" placeholder="Postal Code" 
+                      class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none">
+                    <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STEP 4: Review & Additional Info ==================== -->
+        <div class="form-step transition-opacity duration-300 hidden" id="step-4">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-file-pen text-brand-600"></i> Additional Details & Agreement
+            </h2>
+            <p class="text-sm text-slate-500">Provide final comments and accept the enrollment terms.</p>
+          </div>
+
+          <div class="space-y-6">
+            <!-- Short Bio / Special Requirements -->
+            <div>
+              <label for="bio" class="block text-sm font-semibold text-slate-700 mb-1">
+                Short Bio / Special Requirements <span class="text-slate-400 font-normal">(Optional)</span>
+              </label>
+              <textarea id="bio" name="bio" rows="4" placeholder="Mention accessibility requirements, allergies, or educational background details..." 
+                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none resize-none"></textarea>
+            </div>
+
+            <!-- Summary Preview Box -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <h3 class="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-info text-brand-600"></i> Registration Summary Preview
+              </h3>
+              <div id="review-preview" class="text-xs text-slate-600 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <!-- Dynamically populated via JS -->
+              </div>
+            </div>
+
+            <!-- Terms & Conditions Agreement -->
+            <div class="border-t border-slate-100 pt-4">
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input id="terms" name="terms" type="checkbox" 
+                    class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="terms" class="font-medium text-slate-700">I agree to the <a href="#" class="text-brand-600 underline">Terms and Conditions</a> *</label>
+                  <p class="text-slate-500 text-xs">By checking this box, you confirm that all entered details are true and accurate.</p>
+                </div>
+              </div>
+              <p class="error-msg text-xs text-rose-500 mt-1 hidden"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons Footer -->
+        <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+          <button type="button" id="resetBtn" class="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-right"></i> Reset Form
+          </button>
+
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <button type="button" id="prevBtn" class="w-1/2 sm:w-auto px-6 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 hidden">
+              <i class="fa-solid fa-arrow-left text-xs"></i> Back
+            </button>
+            <button type="button" id="nextBtn" class="w-1/2 sm:w-auto px-6 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-medium transition-colors shadow-md shadow-brand-500/20 flex items-center justify-center gap-2">
+              Next <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+            <button type="submit" id="submitBtn" class="w-1/2 sm:w-auto px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 hidden">
+              Submit <i class="fa-solid fa-check text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <div id="successModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl transform scale-95 transition-transform duration-300" id="modalCard">
+      
+      <!-- Printable Summary Section -->
+      <div id="printable-area" class="p-6 sm:p-8">
+        <div class="text-center pb-6 border-b border-slate-100">
+          <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-800">Demo Registration Complete!</h2>
+          <p class="text-sm text-slate-500 mt-1">Review or print your sample registration below.</p>
+        </div>
+
+        <div class="mt-6 space-y-4 text-sm text-slate-700">
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
+            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider text-brand-600 mb-2">Personal Info</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+              <p><span class="font-semibold">Name:</span> <span id="summary-name"></span></p>
+              <p><span class="font-semibold">DOB:</span> <span id="summary-dob"></span></p>
+              <p><span class="font-semibold">Gender:</span> <span id="summary-gender"></span></p>
+              <p><span class="font-semibold">Email:</span> <span id="summary-email"></span></p>
+              <p><span class="font-semibold">Phone:</span> <span id="summary-phone"></span></p>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
+            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider text-brand-600 mb-2">Academic Profile</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+              <p><span class="font-semibold">Student ID:</span> <span id="summary-id"></span></p>
+              <p><span class="font-semibold">Level:</span> <span id="summary-level"></span></p>
+              <p><span class="font-semibold">Major:</span> <span id="summary-major"></span></p>
+              <p><span class="font-semibold">Term:</span> <span id="summary-term"></span></p>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
+            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider text-brand-600 mb-2">Emergency Contact & Address</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+              <p><span class="font-semibold">Contact:</span> <span id="summary-emergency-name"></span></p>
+              <p><span class="font-semibold">Relation:</span> <span id="summary-emergency-rel"></span></p>
+              <p><span class="font-semibold">Emergency Phone:</span> <span id="summary-emergency-phone"></span></p>
+              <p class="sm:col-span-2"><span class="font-semibold">Address:</span> <span id="summary-address"></span></p>
+            </div>
+          </div>
+
+          <div id="summary-bio-container" class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100 hidden">
+            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider text-brand-600 mb-1">Additional Notes</h3>
+            <p id="summary-bio" class="text-xs text-slate-600 italic"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="p-4 sm:p-6 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 no-print">
+        <button id="closeModalBtn" type="button" class="px-5 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-200 transition-colors text-sm">
+          Close
+        </button>
+        <div class="flex items-center gap-2">
+          <button id="printBtn" type="button" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium transition-colors text-sm flex items-center gap-2">
+            <i class="fa-solid fa-print"></i> Print Details
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+    <p>© 2026 Student Registration Portal. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentStep = 1;
+      const totalSteps = 4;
+
+      // Elements
+      const form = document.getElementById('registrationForm');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const progressLine = document.getElementById('progress-line');
+      const successModal = document.getElementById('successModal');
+      const modalCard = document.getElementById('modalCard');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const printBtn = document.getElementById('printBtn');
+
+      // Update Navigation & UI
+      const updateStepUI = () => {
+        // Show active step, hide others
+        document.querySelectorAll('.form-step').forEach((step, idx) => {
+          if (idx + 1 === currentStep) {
+            step.classList.remove('hidden');
+          } else {
+            step.classList.add('hidden');
+          }
+        });
+
+        // Update Step Indicators
+        document.querySelectorAll('.step-indicator').forEach((ind) => {
+          const stepNum = parseInt(ind.getAttribute('data-step'));
+          const circle = ind.querySelector('.step-circle');
+          const label = ind.querySelector('span');
+
+          if (stepNum < currentStep) {
+            circle.className = 'step-circle w-10 h-10 rounded-full bg-emerald-600 text-white font-semibold flex items-center justify-center shadow-md transition-all';
+            circle.innerHTML = '<i class="fa-solid fa-check text-xs"></i>';
+            label.className = 'text-xs font-medium mt-2 text-emerald-600';
+          } else if (stepNum === currentStep) {
+            circle.className = 'step-circle w-10 h-10 rounded-full bg-brand-600 text-white font-semibold flex items-center justify-center shadow-md transition-all';
+            circle.innerText = stepNum;
+            label.className = 'text-xs font-medium mt-2 text-brand-600';
+          } else {
+            circle.className = 'step-circle w-10 h-10 rounded-full bg-slate-200 text-slate-600 font-semibold flex items-center justify-center transition-all';
+            circle.innerText = stepNum;
+            label.className = 'text-xs font-medium mt-2 text-slate-500';
+          }
+        });
+
+        // Update Progress Line width
+        const percentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+        progressLine.style.width = `${percentage}%`;
+
+        // Button states
+        if (currentStep === 1) {
+          prevBtn.classList.add('hidden');
+        } else {
+          prevBtn.classList.remove('hidden');
+        }
+
+        if (currentStep === totalSteps) {
+          nextBtn.classList.add('hidden');
+          submitBtn.classList.remove('hidden');
+          updateReviewPreview();
+        } else {
+          nextBtn.classList.remove('hidden');
+          submitBtn.classList.add('hidden');
+        }
+      };
+
+      // Validation Helper Functions
+      const showError = (fieldId, message) => {
+        const input = document.getElementById(fieldId);
+        if (!input) return;
+        const parent = input.closest('div') || input.parentElement;
+        const errorEl = parent.parentElement.querySelector('.error-msg') || parent.querySelector('.error-msg');
+        
+        input.classList.add('border-rose-500', 'focus:ring-rose-500');
+        input.classList.remove('border-slate-300');
+
+        if (errorEl) {
+          errorEl.innerText = message;
+          errorEl.classList.remove('hidden');
+        }
+      };
+
+      const clearError = (fieldId) => {
+        const input = document.getElementById(fieldId);
+        if (!input) return;
+        const parent = input.closest('div') || input.parentElement;
+        const errorEl = parent.parentElement.querySelector('.error-msg') || parent.querySelector('.error-msg');
+        
+        input.classList.remove('border-rose-500', 'focus:ring-rose-500');
+        input.classList.add('border-slate-300');
+
+        if (errorEl) {
+          errorEl.innerText = '';
+          errorEl.classList.add('hidden');
+        }
+      };
+
+      const validateStep = (step) => {
+        let isValid = true;
+
+        if (step === 1) {
+          // Name validation
+          const name = document.getElementById('fullName').value.trim();
+          if (!name) {
+            showError('fullName', 'Full name is required.');
+            isValid = false;
+          } else if (name.split(' ').filter(Boolean).length < 2) {
+            showError('fullName', 'Please enter both first and last name.');
+            isValid = false;
+          } else {
+            clearError('fullName');
+          }
+
+          // DOB validation
+          const dob = document.getElementById('dob').value;
+          if (!dob) {
+            showError('dob', 'Date of birth is required.');
+            isValid = false;
+          } else {
+            clearError('dob');
+          }
+
+          // Gender validation
+          const gender = document.getElementById('gender').value;
+          if (!gender) {
+            showError('gender', 'Please select a gender option.');
+            isValid = false;
+          } else {
+            clearError('gender');
+          }
+
+          // Email validation
+          const email = document.getElementById('email').value.trim();
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!email) {
+            showError('email', 'Email address is required.');
+            isValid = false;
+          } else if (!emailRegex.test(email)) {
+            showError('email', 'Please enter a valid email address.');
+            isValid = false;
+          } else {
+            clearError('email');
+          }
+
+          // Phone validation
+          const phone = document.getElementById('phone').value.trim();
+          if (!phone) {
+            showError('phone', 'Phone number is required.');
+            isValid = false;
+          } else if (phone.length < 7) {
+            showError('phone', 'Please enter a valid phone number.');
+            isValid = false;
+          } else {
+            clearError('phone');
+          }
+        }
+
+        if (step === 2) {
+          // Academic Level
+          const level = document.getElementById('academicLevel').value;
+          if (!level) {
+            showError('academicLevel', 'Please select your academic level.');
+            isValid = false;
+          } else {
+            clearError('academicLevel');
+          }
+
+          // Major
+          const major = document.getElementById('major').value;
+          if (!major) {
+            showError('major', 'Please select a course/major.');
+            isValid = false;
+          } else {
+            clearError('major');
+          }
+
+          // Semester
+          const semester = document.getElementById('semester').value;
+          if (!semester) {
+            showError('semester', 'Please select a semester/term.');
+            isValid = false;
+          } else {
+            clearError('semester');
+          }
+        }
+
+        if (step === 3) {
+          // Emergency Person Name
+          const emName = document.getElementById('emergencyName').value.trim();
+          if (!emName) {
+            showError('emergencyName', 'Emergency contact name is required.');
+            isValid = false;
+          } else {
+            clearError('emergencyName');
+          }
+
+          // Relationship
+          const rel = document.getElementById('relationship').value;
+          if (!rel) {
+            showError('relationship', 'Please select relationship type.');
+            isValid = false;
+          } else {
+            clearError('relationship');
+          }
+
+          // Emergency Phone
+          const emPhone = document.getElementById('emergencyPhone').value.trim();
+          if (!emPhone) {
+            showError('emergencyPhone', 'Emergency contact phone is required.');
+            isValid = false;
+          } else {
+            clearError('emergencyPhone');
+          }
+
+          // Address fields
+          ['street', 'city', 'state', 'postalCode'].forEach((id) => {
+            const val = document.getElementById(id).value.trim();
+            if (!val) {
+              showError(id, 'Field is required.');
+              isValid = false;
+            } else {
+              clearError(id);
+            }
+          });
+        }
+
+        if (step === 4) {
+          // Terms checkbox
+          const terms = document.getElementById('terms').checked;
+          if (!terms) {
+            showError('terms', 'You must agree to the terms and conditions.');
+            isValid = false;
+          } else {
+            clearError('terms');
+          }
+        }
+
+        return isValid;
+      };
+
+      // Populate Step 4 Inline Preview
+      const updateReviewPreview = () => {
+        const previewContainer = document.getElementById('review-preview');
+        const name = document.getElementById('fullName').value || 'N/A';
+        const major = document.getElementById('major').value || 'N/A';
+        const term = document.getElementById('semester').value || 'N/A';
+        const phone = document.getElementById('phone').value || 'N/A';
+
+        previewContainer.innerHTML = `
+          <div><strong class="text-slate-700">Name:</strong> <span data-review="name"></span></div>
+          <div><strong class="text-slate-700">Major:</strong> <span data-review="major"></span></div>
+          <div><strong class="text-slate-700">Term:</strong> <span data-review="term"></span></div>
+          <div><strong class="text-slate-700">Phone:</strong> <span data-review="phone"></span></div>
+        `;
+        Object.entries({name, major, term, phone}).forEach(([key, value]) => {
+          previewContainer.querySelector('[data-review="' + key + '"]').textContent = value;
+        });
+      };
+
+      // Next / Prev Button Listeners
+      nextBtn.addEventListener('click', () => {
+        if (validateStep(currentStep)) {
+          if (currentStep < totalSteps) {
+            currentStep++;
+            updateStepUI();
+          }
+        }
+      });
+
+      prevBtn.addEventListener('click', () => {
+        if (currentStep > 1) {
+          currentStep--;
+          updateStepUI();
+        }
+      });
+
+      // Reset Form Listener
+      resetBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all form fields?')) {
+          form.reset();
+          document.querySelectorAll('.error-msg').forEach((el) => el.classList.add('hidden'));
+          document.querySelectorAll('input, select, textarea').forEach((el) => {
+            el.classList.remove('border-rose-500', 'focus:ring-rose-500');
+            el.classList.add('border-slate-300');
+          });
+          currentStep = 1;
+          updateStepUI();
+        }
+      });
+
+      // Form Submit Handler
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (currentStep !== totalSteps) return;
+        for (let step = 1; step <= totalSteps; step++) {
+          if (!validateStep(step)) {
+            currentStep = step;
+            updateStepUI();
+            return;
+          }
+        }
+
+        {
+          // Fill Modal Summary Data
+          document.getElementById('summary-name').innerText = document.getElementById('fullName').value;
+          document.getElementById('summary-dob').innerText = document.getElementById('dob').value;
+          document.getElementById('summary-gender').innerText = document.getElementById('gender').value;
+          document.getElementById('summary-email').innerText = document.getElementById('email').value;
+          document.getElementById('summary-phone').innerText = document.getElementById('phone').value;
+
+          document.getElementById('summary-id').innerText = document.getElementById('studentId').value || 'N/A';
+          document.getElementById('summary-level').innerText = document.getElementById('academicLevel').value;
+          document.getElementById('summary-major').innerText = document.getElementById('major').value;
+          document.getElementById('summary-term').innerText = document.getElementById('semester').value;
+
+          document.getElementById('summary-emergency-name').innerText = document.getElementById('emergencyName').value;
+          document.getElementById('summary-emergency-rel').innerText = document.getElementById('relationship').value;
+          document.getElementById('summary-emergency-phone').innerText = document.getElementById('emergencyPhone').value;
+
+          const street = document.getElementById('street').value;
+          const city = document.getElementById('city').value;
+          const state = document.getElementById('state').value;
+          const postal = document.getElementById('postalCode').value;
+          document.getElementById('summary-address').innerText = `${street}, ${city}, ${state} ${postal}`;
+
+          const bio = document.getElementById('bio').value.trim();
+          const bioContainer = document.getElementById('summary-bio-container');
+          if (bio) {
+            document.getElementById('summary-bio').innerText = bio;
+            bioContainer.classList.remove('hidden');
+          } else {
+            bioContainer.classList.add('hidden');
+          }
+
+          // Show Modal with Animation
+          successModal.classList.remove('pointer-events-none');
+          successModal.classList.add('opacity-100');
+          modalCard.classList.remove('scale-95');
+          modalCard.classList.add('scale-100');
+        }
+      });
+
+      // Close Modal Handler
+      closeModalBtn.addEventListener('click', () => {
+        successModal.classList.add('pointer-events-none');
+        successModal.classList.remove('opacity-100');
+        modalCard.classList.remove('scale-100');
+        modalCard.classList.add('scale-95');
+      });
+
+      // Print Summary Handler
+      printBtn.addEventListener('click', () => {
+        window.print();
+      });
+
+      // Clear input validation errors live on user typing
+      form.querySelectorAll('input, select, textarea').forEach((element) => {
+        element.addEventListener('input', () => {
+          clearError(element.id);
+        });
+        element.addEventListener('change', () => {
+          clearError(element.id);
+        });
+      });
+
+      // Initial state load
+      updateStepUI();
+    });
+  </script>
+</body>
+</html>

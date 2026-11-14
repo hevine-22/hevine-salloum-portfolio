@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute & Cool Preloader Playground</title>
+    <!-- Tailwind CSS for modern layout utilities -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for cute icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Outfit for bouncy, readable display typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-pastel: #FFF5F7;
+            --accent-pink: #FF85A1;
+            --accent-purple: #B5838D;
+            --accent-yellow: #FFD166;
+            --accent-mint: #06D6A0;
+            --accent-blue: #118AB2;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--bg-pastel);
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .heading-font {
+            font-family: 'Fredoka', cursive;
+        }
+
+        /* Animated Background Pattern */
+        .bg-pattern {
+            background-image: radial-gradient(#ffb4a2 1.5px, transparent 1.5px), radial-gradient(#e5989b 1.5px, #fff5f7 1.5px);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            animation: patternMove 20s linear infinite;
+        }
+
+        @keyframes patternMove {
+            0% { background-position: 0 0, 30px 30px; }
+            100% { background-position: 60px 60px, 90px 90px; }
+        }
+
+        /* Bouncy Floating Text Characters */
+        .bouncy-text span {
+            display: inline-block;
+            animation: bounce 1.2s infinite ease-in-out;
+            animation-delay: calc(0.1s * var(--i));
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-16px) scale(1.08) rotate(calc(var(--i) * 2deg)); color: var(--accent-pink); }
+        }
+
+        /* Floating Bobbing Effect for Cat Mascot */
+        .float-bob {
+            animation: float 2.5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-14px) rotate(-3deg); }
+        }
+
+        /* Cat Paws Tapping Animation */
+        .paw-left {
+            animation: tapLeft 0.5s ease-in-out infinite alternate;
+            transform-origin: top right;
+        }
+        .paw-right {
+            animation: tapRight 0.5s ease-in-out infinite alternate 0.25s;
+            transform-origin: top left;
+        }
+
+        @keyframes tapLeft {
+            0% { transform: rotate(0deg) translateY(0); }
+            100% { transform: rotate(-12deg) translateY(6px); }
+        }
+        @keyframes tapRight {
+            0% { transform: rotate(0deg) translateY(0); }
+            100% { transform: rotate(12deg) translateY(6px); }
+        }
+
+        /* Cute Tail Wiggle */
+        .tail-wiggle {
+            animation: wiggle 1.2s ease-in-out infinite alternate;
+            transform-origin: bottom left;
+        }
+
+        @keyframes wiggle {
+            0% { transform: rotate(-8deg); }
+            100% { transform: rotate(20deg); }
+        }
+
+        /* Eyes Blinking */
+        .cat-eye {
+            animation: blink 3.5s infinite;
+            transform-origin: center;
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        /* Confetti Burst Particles */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: popOut 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popOut {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* Shiny Progress Bar Fill Effect */
+        .progress-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-shine::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: shine 1.8s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        /* Playful Pulse for Interactive Elements */
+        .btn-bounce {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-bounce:hover {
+            transform: scale(1.08) translateY(-2px);
+        }
+        .btn-bounce:active {
+            transform: scale(0.95) translateY(2px);
+        }
+
+        /* Preloader Transition Out Curtain Effect */
+        .preloader-hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-100%);
+            transition: all 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        /* Custom Scrollbar for Main Content */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ffe5ec;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ffb4a2;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff85a1;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-pattern text-slate-700 flex flex-col justify-between overflow-x-hidden">
+
+    <!-- PRELOADER OVERLAY -->
+    <div id="preloader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FFF5F7] px-4 transition-all duration-700">
+        <!-- Floating Stars & Decor Background elements -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+            <i class="fa-solid fa-sparkles text-pink-300 text-2xl absolute top-12 left-1/4 animate-pulse"></i>
+            <i class="fa-solid fa-star text-yellow-300 text-xl absolute top-1/3 right-1/5 animate-bounce"></i>
+            <i class="fa-solid fa-cloud text-pink-200 text-4xl absolute bottom-1/4 left-1/6 float-bob"></i>
+            <i class="fa-solid fa-heart text-red-300 text-xl absolute bottom-12 right-1/3 animate-ping" style="animation-duration: 2s;"></i>
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center max-w-sm w-full text-center">
+            
+            <!-- Funny Cute Animated SVG Cat Graphic (Typing/Loading) -->
+            <div class="relative mb-6 float-bob cursor-pointer group" id="mascotContainer" title="Click me for cute sounds!">
+                <!-- Thought Bubble with Funny Random Thoughts -->
+                <div id="thoughtBubble" class="absolute -top-12 -right-8 bg-white border-2 border-slate-800 rounded-2xl px-3 py-1 text-xs font-bold shadow-md opacity-0 transition-all duration-300 transform translate-y-2 pointer-events-none whitespace-nowrap z-20">
+                    <span id="thoughtText">Sweating for pixels... 🐱💦</span>
+                    <div class="absolute -bottom-2 left-4 w-3 h-3 bg-white border-b-2 border-r-2 border-slate-800 rotate-45"></div>
+                </div>
+
+                <!-- Animated SVG Graphic -->
+                <svg width="180" height="180" viewBox="0 0 200 200" class="drop-shadow-xl">
+                    <!-- Laptop Screen Glow -->
+                    <ellipse cx="100" cy="165" rx="70" ry="12" fill="#E2E8F0" />
+                    
+                    <!-- Cat Tail -->
+                    <path class="tail-wiggle" d="M 50 135 Q 20 120 25 95 Q 30 75 42 85" fill="none" stroke="#FF9EAA" stroke-width="12" stroke-linecap="round" />
+
+                    <!-- Cat Body -->
+                    <path d="M 60 140 Q 60 90 100 90 Q 140 90 140 140 Z" fill="#FFBFA9" />
+
+                    <!-- Cat Head -->
+                    <circle cx="100" cy="80" r="42" fill="#FFBFA9" />
+                    
+                    <!-- Ears -->
+                    <polygon points="68,55 60,20 85,45" fill="#FFBFA9" />
+                    <polygon points="72,52 65,27 83,45" fill="#FF9EAA" />
+                    
+                    <polygon points="132,55 140,20 115,45" fill="#FFBFA9" />
+                    <polygon points="128,52 135,27 117,45" fill="#FF9EAA" />
+
+                    <!-- Cheeks -->
+                    <circle cx="75" cy="85" r="7" fill="#FF85A1" opacity="0.6" />
+                    <circle cx="125" cy="85" r="7" fill="#FF85A1" opacity="0.6" />
+
+                    <!-- Eyes -->
+                    <g class="cat-eye">
+                        <circle cx="83" cy="75" r="5" fill="#2D3748" />
+                        <circle cx="84.5" cy="73.5" r="2" fill="white" />
+                        <circle cx="117" cy="75" r="5" fill="#2D3748" />
+                        <circle cx="118.5" cy="73.5" r="2" fill="white" />
+                    </g>
+
+                    <!-- Cute Snout & Mouth -->
+                    <ellipse cx="100" cy="83" rx="3" ry="2" fill="#FF85A1" />
+                    <path d="M 95 86 Q 100 91 100 86 Q 100 91 105 86" fill="none" stroke="#2D3748" stroke-width="2" stroke-linecap="round" />
+
+                    <!-- Cute Glasses (Cool Factor) -->
+                    <rect x="70" y="66" width="26" height="18" rx="5" fill="none" stroke="#2D3748" stroke-width="3" />
+                    <rect x="104" y="66" width="26" height="18" rx="5" fill="none" stroke="#2D3748" stroke-width="3" />
+                    <line x1="96" y1="73" x2="104" y2="73" stroke="#2D3748" stroke-width="3" />
+
+                    <!-- Laptop Lid -->
+                    <path d="M 65 140 L 135 140 L 140 108 L 60 108 Z" fill="#4A5568" />
+                    <path d="M 67 137 L 133 137 L 137 112 L 63 112 Z" fill="#6366F1" />
+                    <!-- Cute Sticker on Laptop -->
+                    <circle cx="100" cy="124" r="6" fill="#FFD166" />
+                    <path d="M 100 120 L 101 123 L 104 124 L 101 125 L 100 128 L 99 125 L 96 124 L 99 123 Z" fill="#2D3748" />
+
+                    <!-- Laptop Keyboard Base -->
+                    <path d="M 50 148 L 150 148 L 160 156 L 40 156 Z" fill="#CBD5E1" />
+
+                    <!-- Paws Typing (Animated) -->
+                    <ellipse class="paw-left" cx="78" cy="138" rx="8" ry="6" fill="#FFF" stroke="#FFBFA9" stroke-width="2" />
+                    <ellipse class="paw-right" cx="122" cy="138" rx="8" ry="6" fill="#FFF" stroke="#FFBFA9" stroke-width="2" />
+                </svg>
+
+                <!-- Floating Heart Emoji on Hover -->
+                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-2xl animate-bounce">
+                    💖
+                </div>
+            </div>
+
+            <!-- Bouncy Loading Title -->
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-2 bouncy-text tracking-wide flex justify-center gap-1">
+                <span style="--i:1">L</span>
+                <span style="--i:2">o</span>
+                <span style="--i:3">a</span>
+                <span style="--i:4">d</span>
+                <span style="--i:5">i</span>
+                <span style="--i:6">n</span>
+                <span style="--i:7">g</span>
+                <span style="--i:8">.</span>
+                <span style="--i:9">.</span>
+                <span style="--i:10">.</span>
+            </h1>
+
+            <!-- Dynamic Subtitle / Funny Status Messages -->
+            <p id="funnyStatus" class="text-sm font-semibold text-slate-500 min-h-[24px] mb-6 animate-pulse">
+                Teaching hamster to wheel faster...
+            </p>
+
+            <!-- Playful Progress Bar Frame -->
+            <div class="w-full bg-white p-2 rounded-3xl border-4 border-slate-800 shadow-[4px_4px_0px_#2D3748] relative mb-3">
+                <div class="w-full bg-pink-100 h-6 rounded-2xl overflow-hidden relative">
+                    <!-- Actual Progress Fill -->
+                    <div id="progressBar" class="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 h-full rounded-2xl w-0 transition-all duration-300 progress-shine"></div>
+                </div>
+            </div>
+
+            <!-- Percentage Counter & Cute Status -->
+            <div class="w-full flex justify-between items-center text-xs font-bold text-slate-600 px-2">
+                <span id="loadingSpeedTag" class="bg-yellow-200 text-yellow-800 px-2.5 py-1 rounded-full border border-yellow-400 shadow-sm">
+                    🚀 TURBO MODE
+                </span>
+                <span class="text-base font-extrabold text-slate-800">
+                    <span id="progressPercent">0</span>%
+                </span>
+            </div>
+
+            <!-- Fast Forward Interactive Button inside Preloader -->
+            <button id="speedUpBtn" class="mt-6 btn-bounce bg-pink-500 hover:bg-pink-600 active:bg-pink-700 text-white font-bold py-2 px-5 rounded-2xl border-2 border-slate-800 shadow-[3px_3px_0px_#2D3748] flex items-center gap-2 text-xs uppercase tracking-wider">
+                <i class="fa-solid fa-bolt text-yellow-300 animate-bounce"></i> Poke To Speed Up!
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN PAGE CONTENT (Initially Hidden Behind Preloader) -->
+    <main id="mainContent" class="relative min-h-screen flex flex-col justify-between p-4 sm:p-8 max-w-5xl mx-auto opacity-0 transition-opacity duration-1000">
+        
+        <!-- Top Navigation -->
+        <header class="flex justify-between items-center bg-white/80 backdrop-blur-md p-4 rounded-3xl border-2 border-slate-800 shadow-[4px_4px_0px_#2D3748] mb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-pink-400 rounded-2xl border-2 border-slate-800 flex items-center justify-center text-white text-xl shadow-sm">
+                    🐾
+                </div>
+                <span class="font-bold text-xl text-slate-800 tracking-tight">KawaiiLoader</span>
+            </div>
+            
+            <button id="reloadPreloaderBtn" class="btn-bounce bg-yellow-300 hover:bg-yellow-400 text-slate-800 font-bold px-4 py-2 rounded-2xl border-2 border-slate-800 shadow-[3px_3px_0px_#2D3748] flex items-center gap-2 text-xs sm:text-sm">
+                <i class="fa-solid fa-rotate text-slate-800"></i> Re-test Preloader
+            </button>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center my-auto py-8">
+            <div class="space-y-6 text-center md:text-left">
+                <div class="inline-block bg-pink-100 text-pink-600 font-bold px-4 py-1.5 rounded-full border border-pink-300 text-xs tracking-wider uppercase">
+                    ✨ Loading Completed!
+                </div>
+                <h2 class="text-4xl sm:text-5xl font-black text-slate-800 leading-tight">
+                    Welcome to the Cute Side of the Web! 🌈
+                </h2>
+                <p class="text-slate-600 font-medium text-base sm:text-lg leading-relaxed">
+                    You made it through the fluffiest preloader ever built. This page features dynamic state management, custom CSS keyframe animations, responsive Tailwind layouts, and interactive playful widgets!
+                </p>
+
+                <!-- Interactive Trigger Buttons Grid -->
+                <div class="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
+                    <button id="btnSlowLoad" class="btn-bounce bg-indigo-400 hover:bg-indigo-500 text-white font-bold px-5 py-3 rounded-2xl border-2 border-slate-800 shadow-[4px_4px_0px_#2D3748] text-sm flex items-center gap-2">
+                        🐢 Slow Loader (5s)
+                    </button>
+                    <button id="btnInstantLoad" class="btn-bounce bg-emerald-400 hover:bg-emerald-500 text-white font-bold px-5 py-3 rounded-2xl border-2 border-slate-800 shadow-[4px_4px_0px_#2D3748] text-sm flex items-center gap-2">
+                        ⚡ Hyper Loader (1.5s)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feature Showcase Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-white p-5 rounded-3xl border-2 border-slate-800 shadow-[4px_4px_0px_#2D3748] hover:-translate-y-1 transition-transform">
+                    <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center text-2xl mb-3 border border-purple-300">
+                        🎨
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base mb-1">Pastel Aesthetics</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">Soft pastel colors combined with bold playful border strokes.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl border-2 border-slate-800 shadow-[4px_4px_0px_#2D3748] hover:-translate-y-1 transition-transform">
+                    <div class="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center text-2xl mb-3 border border-pink-300">
+                        🐱
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base mb-1">SVG Animations</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">Lightweight CSS vector graphics with typing paws and tail wiggles.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl border-2 border-slate-800 shadow-[4px_4px_0px_#2D3748] hover:-translate-y-1 transition-transform">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center text-2xl mb-3 border border-yellow-300">
+                        💬
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base mb-1">Funny Quotes</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">Rotates humorous loading messages so users never get bored.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl border-2 border-slate-800 shadow-[4px_4px_0px_#2D3748] hover:-translate-y-1 transition-transform">
+                    <div class="w-12 h-12 bg-teal-100 rounded-2xl flex items-center justify-center text-2xl mb-3 border border-teal-300">
+                        ✨
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base mb-1">Confetti Burst</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">Interactive clicks trigger cheerful particle effects on demand!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-xs font-semibold text-slate-500 bg-white/60 backdrop-blur-sm py-4 rounded-2xl border border-slate-200">
+            Crafted with 💖, cute animations, and playful vibes. Try poking the cat!
+        </footer>
+    </main>
+
+    <script>
+        // --- Funny Loading Thoughts & Status Messages ---
+        const funnyMessages = [
+            "Teaching hamster to run faster... 🐹",
+            "Polishing pixels with extra glitter... ✨",
+            "Waking up sleepy servers... 😴",
+            "Bribing the cat with catnip... 🐱",
+            "Downloading extra happiness... 💖",
+            "Chasing laser pointers... 🔴",
+            "Untangling internet wires... 🧶",
+            "Baking fresh cookies for you... 🍪",
+            "Assembling tiny rainbows... 🌈",
+            "Almost there, stay adorable... 🌸"
+        ];
+
+        const catThoughts = [
+            "Need more coffee... ☕",
+            "Who typed that bug? 🐛",
+            "Meow-ti-tasking! 🐾",
+            "Feed me treats! 🐟",
+            "Purr-fect code incoming! 💻",
+            "Boop my nose! 👆"
+        ];
+
+        // --- DOM Elements Reference ---
+        const preloader = document.getElementById('preloader');
+        const mainContent = document.getElementById('mainContent');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const funnyStatus = document.getElementById('funnyStatus');
+        const speedUpBtn = document.getElementById('speedUpBtn');
+        const reloadPreloaderBtn = document.getElementById('reloadPreloaderBtn');
+        const btnSlowLoad = document.getElementById('btnSlowLoad');
+        const btnInstantLoad = document.getElementById('btnInstantLoad');
+        const mascotContainer = document.getElementById('mascotContainer');
+        const thoughtBubble = document.getElementById('thoughtBubble');
+        const thoughtText = document.getElementById('thoughtText');
+
+        // --- State Variables ---
+        let progress = 0;
+        let progressInterval = null;
+        let messageInterval;
+        let finishTimer;
+        let speedMultiplier = 1;
+        let targetDuration = 3500; // Default load time 3.5s
+
+        // --- Sound Effects Synthesizer (Web Audio API - No External Files) ---
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playPop() {
+                try {
+                    this.init();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.1);
+                    
+                    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.1);
+                } catch (e) {
+                    // Audio fallback if muted or blocked by browser policy
+                }
+            }
+
+            playComplete() {
+                try {
+                    this.init();
+                    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                    notes.forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.08);
+
+                        gain.gain.setValueAtTime(0.2, this.ctx.currentTime + idx * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.08 + 0.3);
+
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(this.ctx.currentTime + idx * 0.08);
+                        osc.stop(this.ctx.currentTime + idx * 0.08 + 0.3);
+                    });
+                } catch (e) {}
+            }
+        }
+
+        const audio = new SoundFX();
+
+        // --- Confetti / Particle Burst Generator ---
+        function createConfetti(x, y) {
+            const colors = ['#FF85A1', '#FFD166', '#06D6A0', '#118AB2', '#B5838D', '#A2D2FF'];
+            for (let i = 0; i < 16; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = Math.random() * 10 + 6;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Position near click location
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+
+                // Random translation trajectory
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 80 + 30;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+
+                document.body.appendChild(particle);
+
+                setTimeout(() => {
+                    particle.remove();
+                }, 800);
+            }
+        }
+
+        // --- Preloader Progress Logic ---
+        function startLoading(duration = 3500) {
+            clearInterval(progressInterval);
+            clearInterval(messageInterval);
+            clearTimeout(finishTimer);
+            // Reset UI & State
+            progress = 0;
+            speedMultiplier = 1;
+            targetDuration = duration;
+            progressBar.style.width = '0%';
+            progressPercent.textContent = '0';
+            
+            // Show Preloader, Hide Main Content
+            preloader.classList.remove('preloader-hidden');
+            mainContent.classList.add('opacity-0');
+            document.body.style.overflow = 'hidden';
+
+            // Message Rotator Interval
+            let messageIndex = 0;
+            funnyStatus.textContent = funnyMessages[0];
+            messageInterval = setInterval(() => {
+                if (progress >= 100) {
+                    clearInterval(messageInterval);
+                } else {
+                    messageIndex = (messageIndex + 1) % funnyMessages.length;
+                    funnyStatus.textContent = funnyMessages[messageIndex];
+                }
+            }, 1200);
+
+            // Smooth Progress Increment Loop
+            const stepTime = 50; // ms
+            const totalSteps = duration / stepTime;
+            
+            clearInterval(progressInterval);
+            
+            progressInterval = setInterval(() => {
+                // Increment progress dynamically with slight randomness
+                const increment = (100 / totalSteps) * speedMultiplier * (0.8 + Math.random() * 0.4);
+                progress += increment;
+
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(progressInterval);
+                    clearInterval(messageInterval);
+                    finishLoading();
+                }
+
+                progressBar.style.width = `${progress}%`;
+                progressPercent.textContent = Math.floor(progress);
+            }, stepTime);
+        }
+
+        function finishLoading() {
+            funnyStatus.textContent = "All done! Launching cuteness... 🎉";
+            audio.playComplete();
+
+            // Trigger burst of celebration confetti around the mascot
+            const rect = mascotContainer.getBoundingClientRect();
+            createConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+            finishTimer = setTimeout(() => {
+                // Hide Preloader Curtain Transition
+                preloader.classList.add('preloader-hidden');
+                mainContent.classList.remove('opacity-0');
+                document.body.style.overflow = 'auto';
+            }, 600);
+        }
+
+        // --- Interactive Event Listeners ---
+
+        // Poke / Speed up loading button inside preloader
+        speedUpBtn.addEventListener('click', (e) => {
+            speedMultiplier += 1.5;
+            audio.playPop();
+            
+            // Visual bounce feedback
+            speedUpBtn.classList.add('scale-110');
+            setTimeout(() => speedUpBtn.classList.remove('scale-110'), 150);
+
+            // Pop confetti at button click
+            createConfetti(e.clientX, e.clientY);
+
+            // Show funny pop feedback text
+            thoughtText.textContent = "ZOOMING NOW! ⚡";
+            thoughtBubble.style.opacity = '1';
+            thoughtBubble.style.transform = 'translateY(0)';
+            
+            setTimeout(() => {
+                thoughtBubble.style.opacity = '0';
+                thoughtBubble.style.transform = 'translateY(8px)';
+            }, 1200);
+        });
+
+        // Click on mascot cat to trigger funny thoughts and sounds
+        mascotContainer.addEventListener('click', (e) => {
+            audio.playPop();
+            createConfetti(e.clientX, e.clientY);
+
+            const randomThought = catThoughts[Math.floor(Math.random() * catThoughts.length)];
+            thoughtText.textContent = randomThought;
+            thoughtBubble.style.opacity = '1';
+            thoughtBubble.style.transform = 'translateY(0)';
+
+            setTimeout(() => {
+                thoughtBubble.style.opacity = '0';
+                thoughtBubble.style.transform = 'translateY(8px)';
+            }, 1800);
+        });
+
+        // Main Page Reload Buttons
+        reloadPreloaderBtn.addEventListener('click', () => {
+            audio.playPop();
+            startLoading(3000);
+        });
+
+        btnSlowLoad.addEventListener('click', () => {
+            audio.playPop();
+            startLoading(6000);
+        });
+
+        btnInstantLoad.addEventListener('click', () => {
+            audio.playPop();
+            startLoading(1200);
+        });
+
+        // Global click listener for playful particle pops on the main screen
+        document.addEventListener('click', (e) => {
+            // Avoid triggering particle overlapping on buttons
+            if (e.target.closest('button') || e.target.closest('#mascotContainer')) return;
+            createConfetti(e.clientX, e.clientY);
+        });
+
+        // --- Initialize on Page Load ---
+        window.addEventListener('load', () => {
+            startLoading(3500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Explorer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="loadCity('Tokyo')">
+                <div class="p-2 bg-blue-600 text-white rounded-lg">
+                    <i data-lucide="compass" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-lg text-slate-900 tracking-tight">CityExplorer</span>
+            </div>
+
+            <!-- Header Search Bar -->
+            <div class="relative flex-1 max-w-sm">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input type="text" id="searchInput" placeholder="Search city (e.g. Paris, Beirut, Rome)..." 
+                    class="w-full pl-9 pr-4 py-2 text-sm bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                <div id="searchDropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden z-50 max-h-60 overflow-y-auto"></div>
+            </div>
+
+            <!-- Bookmark Button -->
+            <button onclick="toggleFavModal()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition">
+                <i data-lucide="bookmark" class="w-4 h-4 text-amber-500"></i>
+                <span class="hidden sm:inline">Saved</span>
+                <span id="favBadge" class="bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">0</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-6 space-y-6">
+
+        <!-- Quick Search Chips -->
+        <div class="flex flex-wrap items-center gap-2 text-sm">
+            <span class="text-xs font-semibold uppercase text-slate-400 mr-1">Popular:</span>
+            <button onclick="loadCity('Tokyo')" class="px-3 py-1 bg-white border border-slate-200 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition text-xs font-medium">Tokyo</button>
+            <button onclick="loadCity('Paris')" class="px-3 py-1 bg-white border border-slate-200 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition text-xs font-medium">Paris</button>
+            <button onclick="loadCity('Beirut')" class="px-3 py-1 bg-white border border-slate-200 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition text-xs font-medium">Beirut</button>
+            <button onclick="loadCity('Rome')" class="px-3 py-1 bg-white border border-slate-200 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition text-xs font-medium">Rome</button>
+            <button onclick="loadCity('New York')" class="px-3 py-1 bg-white border border-slate-200 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition text-xs font-medium">New York</button>
+            <button onclick="loadCity('London')" class="px-3 py-1 bg-white border border-slate-200 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition text-xs font-medium">London</button>
+            <button onclick="loadCity('Cairo')" class="px-3 py-1 bg-white border border-slate-200 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition text-xs font-medium">Cairo</button>
+            <button onclick="loadCity('Sydney')" class="px-3 py-1 bg-white border border-slate-200 rounded-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition text-xs font-medium">Sydney</button>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            
+            <!-- Hero Banner -->
+            <div class="relative h-64 sm:h-80 w-full overflow-hidden bg-slate-900">
+                <img id="cityHeroImage" src="" alt="City Banner" class="w-full h-full object-cover opacity-85">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                
+                <div class="absolute bottom-6 left-6 right-6 text-white flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span id="cityFlag" class="text-2xl">🇯🇵</span>
+                            <span id="cityCountry" class="text-sm font-medium text-slate-300 uppercase tracking-wider">Japan</span>
+                        </div>
+                        <h1 id="cityName" class="text-3xl sm:text-4xl font-bold tracking-tight">Tokyo</h1>
+                        <p id="cityTagline" class="text-xs sm:text-sm text-slate-200 mt-1 max-w-xl font-light">A modern metropolis blending ancient culture and hyper-modern tech.</p>
+                    </div>
+
+                    <!-- Bookmark Action -->
+                    <button id="saveCityBtn" onclick="toggleBookmarkCurrent()" class="self-start sm:self-auto px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/30 rounded-xl text-xs font-semibold flex items-center space-x-2 transition">
+                        <i data-lucide="bookmark" id="saveIcon" class="w-4 h-4"></i>
+                        <span id="saveText">Save City</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-5 border-b border-slate-200 bg-slate-50/50 divide-x divide-y sm:divide-y-0 divide-slate-200 text-xs text-slate-600">
+                <div class="p-3 sm:p-4 text-center">
+                    <span class="block text-slate-400 font-medium">Local Time</span>
+                    <span id="statTime" class="font-bold text-slate-800 text-sm mt-0.5 block">00:00:00</span>
+                </div>
+                <div class="p-3 sm:p-4 text-center">
+                    <span class="block text-slate-400 font-medium">Population</span>
+                    <span id="statPopulation" class="font-bold text-slate-800 text-sm mt-0.5 block">-</span>
+                </div>
+                <div class="p-3 sm:p-4 text-center">
+                    <span class="block text-slate-400 font-medium">Language</span>
+                    <span id="statLanguage" class="font-bold text-slate-800 text-sm mt-0.5 block">-</span>
+                </div>
+                <div class="p-3 sm:p-4 text-center">
+                    <span class="block text-slate-400 font-medium">Currency</span>
+                    <span id="statCurrency" class="font-bold text-slate-800 text-sm mt-0.5 block">-</span>
+                </div>
+                <div class="p-3 sm:p-4 text-center col-span-2 sm:col-span-1">
+                    <span class="block text-slate-400 font-medium">Best Time</span>
+                    <span id="statBestTime" class="font-bold text-slate-800 text-sm mt-0.5 block">-</span>
+                </div>
+            </div>
+
+            <div class="border-b border-slate-200 px-6 pt-4 bg-white">
+                <div class="flex space-x-6 text-sm">
+                    <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn pb-3 border-b-2 border-blue-600 font-semibold text-blue-600 flex items-center space-x-1.5">
+                        <i data-lucide="info" class="w-4 h-4"></i>
+                        <span>Overview</span>
+                    </button>
+                    <button onclick="switchTab('attractions')" id="tab-attractions" class="tab-btn pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1.5">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        <span>Attractions</span>
+                    </button>
+                    <button onclick="switchTab('food')" id="tab-food" class="tab-btn pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1.5">
+                        <i data-lucide="utensils" class="w-4 h-4"></i>
+                        <span>Food & Culture</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <!-- 1. OVERVIEW TAB -->
+                <div id="content-overview" class="tab-content space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-2">About the City</h3>
+                        <p id="cityDescription" class="text-slate-600 leading-relaxed text-sm sm:text-base"></p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-3">Quick Travel Tips</h3>
+                        <div id="cityTipsList" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm"></div>
+                    </div>
+                </div>
+
+                <!-- 2. ATTRACTIONS TAB -->
+                <div id="content-attractions" class="tab-content hidden">
+                    <div id="attractionsGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+                </div>
+
+                <!-- 3. FOOD & CULTURE TAB -->
+                <div id="content-food" class="tab-content hidden">
+                    <div id="foodGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="favModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-xl relative">
+            <button onclick="toggleFavModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                <i data-lucide="bookmark" class="w-5 h-5 text-amber-500"></i>
+                <span>Saved Cities</span>
+            </h3>
+            <div id="favList" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-slate-200 py-6 mt-auto text-center text-xs text-slate-400">
+        <p>© 2026 CityExplorer. Clean, simple, and interactive city discovery.</p>
+    </footer>
+
+    <script>
+        const CITIES = {
+            "Tokyo": {
+                name: "Tokyo",
+                country: "Japan",
+                flag: "🇯🇵",
+                tagline: "A futuristic capital blending neon skyscrapers with ancient temples.",
+                heroImage: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80",
+                offset: 9,
+                population: "14.0 Million",
+                language: "Japanese",
+                currency: "JPY (¥)",
+                bestTime: "Mar - May, Sep - Nov",
+                description: "Tokyo offers an infinite choice of shopping, entertainment, culture, and dining to its visitors. The city's history can be appreciated in districts such as Asakusa and in many excellent museums, historic temples, and gardens.",
+                tips: [
+                    "Get a Pasmo or Suica card for convenient public transit.",
+                    "Tipping at restaurants is generally not customary.",
+                    "Public garbage cans are rare; carry a small bag for trash."
+                ],
+                attractions: [
+                    { name: "Senso-ji Temple", desc: "Tokyo's oldest and most famous Buddhist temple located in Asakusa." },
+                    { name: "Shibuya Crossing", desc: "The world's busiest pedestrian intersection with iconic billboard lights." },
+                    { name: "Tokyo Skytree", desc: "A 634-meter tall tower offering incredible panoramic skyline views." }
+                ],
+                food: [
+                    { name: "Edomae Sushi", desc: "Fresh vinegared rice topped with fresh raw fish." },
+                    { name: "Tonkotsu Ramen", desc: "Rich pork bone broth served with thin wheat noodles." },
+                    { name: "Takoyaki", desc: "Savory fried octopus balls topped with mayo and bonitoflakes." }
+                ]
+            },
+            "Paris": {
+                name: "Paris",
+                country: "France",
+                flag: "🇫🇷",
+                tagline: "The City of Light, world-renowned for art, fashion, and romance.",
+                heroImage: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+                offset: 1,
+                population: "2.1 Million",
+                language: "French",
+                currency: "EUR (€)",
+                bestTime: "May - Oct",
+                description: "Paris is France's capital and a global center for art, fashion, gastronomy, and culture. Its 19th-century cityscape is crisscrossed by wide boulevards and the River Seine.",
+                tips: [
+                    "Always greet shopkeepers with a polite 'Bonjour'.",
+                    "Use the Paris Métro for quick and budget-friendly travel.",
+                    "Buy museum tickets online to skip long entry queues."
+                ],
+                attractions: [
+                    { name: "Eiffel Tower", desc: "The iconic wrought-iron landmark standing on the Champ de Mars." },
+                    { name: "Louvre Museum", desc: "The world's largest art museum housing the Mona Lisa." },
+                    { name: "Notre-Dame Cathedral", desc: "A historic Gothic cathedral located on the Île de la Cité." }
+                ],
+                food: [
+                    { name: "Fresh Croissant", desc: "Flaky, buttery bakery pastry fresh out of the oven." },
+                    { name: "Duck Confit", desc: "Slow-cooked savory duck leg served with garlic potatoes." },
+                    { name: "French Macarons", desc: "Delicate meringue sandwich cookies with sweet ganache." }
+                ]
+            },
+            "Beirut": {
+                name: "Beirut",
+                country: "Lebanon",
+                flag: "🇱🇧",
+                tagline: "A vibrant coastal hub celebrated for history, hospitality, and cuisine.",
+                heroImage: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1200&q=80",
+                offset: 2,
+                population: "2.4 Million",
+                language: "Arabic / French / English",
+                currency: "LBP / USD",
+                bestTime: "Apr - Jun, Sep - Nov",
+                description: "Beirut sits on a peninsula at the midpoint of Lebanon's Mediterranean coast. It is one of the oldest cities in the world, filled with rich archaeological sites, lively seaside promenades, and world-class gastronomy.",
+                tips: [
+                    "Enjoy sunset views along the seaside Corniche.",
+                    "Try shared taxi services ('Service') or rideshare apps.",
+                    "Beirutis are famously hospitable—prepare for warm receptions!"
+                ],
+                attractions: [
+                    { name: "Raouche Sea Rock", desc: "Majestic natural rock arches standing proudly off the coastline." },
+                    { name: "National Museum", desc: "The premier archaeological museum showcasing ancient Phoenician relics." },
+                    { name: "Zaitunay Bay", desc: "A sleek Mediterranean waterfront promenade for dining and strolls." }
+                ],
+                food: [
+                    { name: "Lebanese Mezza & Hummus", desc: "An elaborate feast of creamy hummus, tabbouleh, and warm pita." },
+                    { name: "Beef & Chicken Shawarma", desc: "Spiced marinated meat wrapped with garlic sauce and pickles." },
+                    { name: "Warm Knefeh", desc: "Gooey sweet cheese pastry soaked in orange blossom syrup." }
+                ]
+            },
+            "Rome": {
+                name: "Rome",
+                country: "Italy",
+                flag: "🇮🇹",
+                tagline: "The Eternal City, packed with ancient ruins and vibrant piazza life.",
+                heroImage: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80",
+                offset: 1,
+                population: "2.8 Million",
+                language: "Italian",
+                currency: "EUR (€)",
+                bestTime: "Apr - May, Sep - Oct",
+                description: "Rome, Italy’s capital, is a sprawling, cosmopolitan city with nearly 3,000 years of globally influential art, architecture, and culture on display.",
+                tips: [
+                    "Drink free clean water from public fountains ('nasoni').",
+                    "Do not order cappuccino after 11:00 AM if you want to eat like a local.",
+                    "Validate your bus tickets immediately upon boarding."
+                ],
+                attractions: [
+                    { name: "Colosseum", desc: "The legendary ancient amphitheater built under the Roman Empire." },
+                    { name: "Trevi Fountain", desc: "A breathtaking Baroque fountain where visitors toss coins for good luck." },
+                    { name: "Pantheon", desc: "A remarkably preserved ancient Roman temple with a grand dome." }
+                ],
+                food: [
+                    { name: "Pasta Carbonara", desc: "Classic Roman pasta made with guanciale, egg yolks, and Pecorino." },
+                    { name: "Artisanal Gelato", desc: "Rich, creamy Italian ice cream in dozens of fresh flavors." },
+                    { name: "Pizza al Taglio", desc: "Rectangular pan pizza sold by weight throughout the city." }
+                ]
+            },
+            "New York": {
+                name: "New York",
+                country: "United States",
+                flag: "🇺🇸",
+                tagline: "The Big Apple: a fast-paced global capital of culture and ambition.",
+                heroImage: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=1200&q=80",
+                offset: -4,
+                population: "8.4 Million",
+                language: "English",
+                currency: "USD ($)",
+                bestTime: "Sep - Nov, Apr - Jun",
+                description: "New York City comprises 5 boroughs sitting where the Hudson River meets the Atlantic Ocean. At its core is Manhattan, a densely populated borough that’s among the world’s major commercial, financial and cultural centers.",
+                tips: [
+                    "Use OMNY contactless tap to ride the 24/7 MTA Subway.",
+                    "Walk on the right side of sidewalks and don't stop abruptly.",
+                    "Explore neighborhoods outside Times Square like SoHo or Brooklyn."
+                ],
+                attractions: [
+                    { name: "Central Park", desc: "An expansive 843-acre green oasis nestled in Manhattan." },
+                    { name: "Statue of Liberty", desc: "A iconic symbol of freedom standing in New York Harbor." },
+                    { name: "Times Square & Broadway", desc: "The bustling theater district lit by massive digital displays." }
+                ],
+                food: [
+                    { name: "New York Slice Pizza", desc: "Thin-crust wide pizza slices served piping hot." },
+                    { name: "Everything Bagel with Lox", desc: "Chewy boiled bagel with cream cheese and smoked salmon." },
+                    { name: "Pastrami on Rye", desc: "Thick stacks of spiced smoked pastrami from classic Jewish delis." }
+                ]
+            },
+            "London": {
+                name: "London",
+                country: "United Kingdom",
+                flag: "🇬🇧",
+                tagline: "A historic capital where royal palaces meet modern innovation.",
+                heroImage: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80",
+                offset: 0,
+                population: "8.9 Million",
+                language: "English",
+                currency: "GBP (£)",
+                bestTime: "May - Sep",
+                description: "London, the capital of England and the United Kingdom, is a 21st-century city with history stretching back to Roman times. At its center stand the imposing Houses of Parliament, the iconic 'Big Ben' clock tower, and Westminster Abbey.",
+                tips: [
+                    "Most major museums offer free general entry.",
+                    "Stand on the right side of escalators on the Tube.",
+                    "Tap in and out using your contactless card on public transit."
+                ],
+                attractions: [
+                    { name: "Big Ben & Parliament", desc: "The famous Elizabeth Tower standing beside the River Thames." },
+                    { name: "Tower Bridge", desc: "An iconic Victorian bascule bridge spanning the Thames." },
+                    { name: "British Museum", desc: "A world-class museum housing human history and treasures." }
+                ],
+                food: [
+                    { name: "Fish and Chips", desc: "Crispy battered cod served with thick chips and mushy peas." },
+                    { name: "Traditional Sunday Roast", desc: "Roast beef with Yorkshire pudding, potatoes, and gravy." },
+                    { name: "Afternoon Tea", desc: "Fine teas accompanied by warm scones, cream, and sandwiches." }
+                ]
+            },
+            "Cairo": {
+                name: "Cairo",
+                country: "Egypt",
+                flag: "🇪🇬",
+                tagline: "The City of a Thousand Minarets, gateway to ancient marvels.",
+                heroImage: "https://images.unsplash.com/photo-1572252821143-024364214f4f?auto=format&fit=crop&w=1200&q=80",
+                offset: 2,
+                population: "10.0 Million",
+                language: "Arabic",
+                currency: "EGP (£)",
+                bestTime: "Oct - Apr",
+                description: "Cairo, Egypt’s sprawling capital, is set on the Nile River. At its heart is Tahrir Square and the vast Egyptian Museum, a trove of antiquities including royal mummies and gilded King Tutankhamun artifacts.",
+                tips: [
+                    "Bargain politely at historic markets like Khan el-Khalili.",
+                    "Visit the Giza Pyramids early in the morning to beat the heat.",
+                    "Rideshare apps like Uber are convenient for getting around."
+                ],
+                attractions: [
+                    { name: "Pyramids of Giza", desc: "One of the Seven Wonders of the Ancient World located on Cairo's edge." },
+                    { name: "Khan el-Khalili", desc: "A bustling historic bazaar filled with spices, lamps, and crafts." },
+                    { name: "Grand Egyptian Museum", desc: "A world-class modern museum preserving thousands of pharaonic treasures." }
+                ],
+                food: [
+                    { name: "Koshary", desc: "Egypt's national dish of rice, pasta, lentils, chickpeas, and spiced tomato sauce." },
+                    { name: "Ta'ameya", desc: "Egyptian falafel made with crushed fava beans and fresh herbs." },
+                    { name: "Ful Medames", desc: "Slow-cooked fava beans seasoned with olive oil, cumin, and lemon." }
+                ]
+            },
+            "Sydney": {
+                name: "Sydney",
+                country: "Australia",
+                flag: "🇦🇺",
+                tagline: "A sunny harbor paradise famous for iconic beaches and architecture.",
+                heroImage: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80",
+                offset: 10,
+                population: "5.3 Million",
+                language: "English",
+                currency: "AUD ($)",
+                bestTime: "Sep - Nov, Feb - Apr",
+                description: "Sydney, capital of New South Wales and one of Australia's largest cities, is best known for its seafront Opera House, with a distinctive sail-like design. Sydney Harbour is a hub of vibrant outdoor life.",
+                tips: [
+                    "Take the public ferry from Circular Quay to Manly for scenic views.",
+                    "Always swim between the red and yellow flags at Bondi Beach.",
+                    "Apply sun protection—the Australian sun is very strong."
+                ],
+                attractions: [
+                    { name: "Sydney Opera House", desc: "A world-famous architectural masterpiece on Sydney Harbour." },
+                    { name: "Sydney Harbour Bridge", desc: "An iconic steel arch bridge connecting the city center to the North Shore." },
+                    { name: "Bondi Beach", desc: "A famous crescent of golden sand popular for surfing and coastal walks." }
+                ],
+                food: [
+                    { name: "Fresh Sydney Rock Oysters", desc: "Sweet and creamy local oysters harvested along the coast." },
+                    { name: "Avocado Toast", desc: "Sourdough topped with smashed avocado, feta, and poached eggs." },
+                    { name: "Flat White Coffee", desc: "Espresso topped with microfoam milk, an Aussie coffee staple." }
+                ]
+            }
+        };
+
+        // State Management
+        let currentCityKey = "Tokyo";
+        let favorites = [];
+        try {
+            const saved = JSON.parse(localStorage.getItem("saved_cities_list"));
+            if (Array.isArray(saved)) favorites = saved.filter(key => Object.hasOwn(CITIES, key));
+        } catch {}
+        let timerInterval = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            window.lucide?.createIcons();
+            setupSearch();
+            loadCity('Tokyo');
+            updateFavBadge();
+        });
+
+        // Load City Details
+        function loadCity(key) {
+            const city = CITIES[key];
+            if (!Object.hasOwn(CITIES, key)) return;
+            currentCityKey = key;
+
+            // Header/Hero details
+            document.getElementById('cityName').innerText = city.name;
+            document.getElementById('cityCountry').innerText = city.country;
+            document.getElementById('cityFlag').innerText = city.flag;
+            document.getElementById('cityTagline').innerText = city.tagline;
+            document.getElementById('cityHeroImage').src = city.heroImage;
+
+            // Quick Stats
+            document.getElementById('statPopulation').innerText = city.population;
+            document.getElementById('statLanguage').innerText = city.language;
+            document.getElementById('statCurrency').innerText = city.currency;
+            document.getElementById('statBestTime').innerText = city.bestTime;
+
+            // Live Time
+            if (timerInterval) clearInterval(timerInterval);
+            updateClock(city.offset);
+            timerInterval = setInterval(() => updateClock(city.offset), 1000);
+
+            // Bookmark State
+            updateBookmarkBtn();
+
+            // Overview Tab
+            document.getElementById('cityDescription').innerText = city.description;
+            const tipsEl = document.getElementById('cityTipsList');
+            tipsEl.innerHTML = city.tips.map(tip => `
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-start space-x-2">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0"></i>
+                    <span class="text-slate-700">${tip}</span>
+                </div>
+            `).join('');
+
+            // Attractions Tab
+            const attGrid = document.getElementById('attractionsGrid');
+            attGrid.innerHTML = city.attractions.map(item => `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div class="p-2 bg-blue-100 text-blue-600 rounded-lg w-fit mb-2">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">${item.name}</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">${item.desc}</p>
+                </div>
+            `).join('');
+
+            // Food Tab
+            const foodGrid = document.getElementById('foodGrid');
+            foodGrid.innerHTML = city.food.map(item => `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div class="p-2 bg-amber-100 text-amber-600 rounded-lg w-fit mb-2">
+                        <i data-lucide="utensils" class="w-4 h-4"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-1">${item.name}</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">${item.desc}</p>
+                </div>
+            `).join('');
+
+            window.lucide?.createIcons();
+            switchTab('overview');
+        }
+
+        // Live Clock Helper
+        function updateClock(offsetHours) {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const cityTime = new Date(utc + (3600000 * offsetHours));
+            
+            const hours = String(cityTime.getHours()).padStart(2, '0');
+            const minutes = String(cityTime.getMinutes()).padStart(2, '0');
+            const seconds = String(cityTime.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('statTime').innerText = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Tab Switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-600', 'font-semibold');
+                btn.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+            });
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            activeBtn.classList.add('border-blue-600', 'text-blue-600', 'font-semibold');
+            activeBtn.classList.remove('border-transparent', 'text-slate-500');
+
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+        }
+
+        // Search Bar Logic
+        function setupSearch() {
+            const input = document.getElementById('searchInput');
+            const dropdown = document.getElementById('searchDropdown');
+
+            input.addEventListener('input', (e) => {
+                const q = e.target.value.trim().toLowerCase();
+                if (!q) {
+                    dropdown.classList.add('hidden');
+                    return;
+                }
+
+                const matches = Object.keys(CITIES).filter(key => key.toLowerCase().includes(q));
+
+                if (matches.length > 0) {
+                    dropdown.innerHTML = matches.map(cityKey => `
+                        <div onclick="selectCity('${cityKey}')" class="px-4 py-2.5 hover:bg-slate-50 cursor-pointer flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-2">
+                                <span>${CITIES[cityKey].flag}</span>
+                                <span class="font-medium text-slate-800">${CITIES[cityKey].name}</span>
+                            </div>
+                            <span class="text-xs text-slate-400">${CITIES[cityKey].country}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    dropdown.innerHTML = `
+                        <p class="px-4 py-2.5 text-sm text-slate-600" role="status">City not in this guide.</p>
+                    `;
+                }
+                dropdown.classList.remove('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#searchInput') && !e.target.closest('#searchDropdown')) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        function selectCity(cityKey) {
+            loadCity(cityKey);
+            document.getElementById('searchDropdown').classList.add('hidden');
+            document.getElementById('searchInput').value = '';
+        }
+
+        // Bookmark / Saved City Logic
+        function toggleBookmarkCurrent() {
+            const idx = favorites.indexOf(currentCityKey);
+            if (idx > -1) {
+                favorites.splice(idx, 1);
+            } else {
+                favorites.push(currentCityKey);
+            }
+            localStorage.setItem("saved_cities_list", JSON.stringify(favorites));
+            updateBookmarkBtn();
+            updateFavBadge();
+        }
+
+        function updateBookmarkBtn() {
+            const isSaved = favorites.includes(currentCityKey);
+            const text = document.getElementById('saveText');
+            const icon = document.getElementById('saveIcon');
+
+            if (isSaved) {
+                text.innerText = "Saved";
+                icon.classList.add('fill-amber-400', 'text-amber-400');
+            } else {
+                text.innerText = "Save City";
+                icon.classList.remove('fill-amber-400', 'text-amber-400');
+            }
+        }
+
+        function updateFavBadge() {
+            document.getElementById('favBadge').innerText = favorites.length;
+        }
+
+        function toggleFavModal() {
+            const modal = document.getElementById('favModal');
+            const list = document.getElementById('favList');
+
+            if (modal.classList.contains('hidden')) {
+                if (favorites.length === 0) {
+                    list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No saved cities yet. Bookmark cities to view them quickly!</p>`;
+                } else {
+                    list.innerHTML = favorites.map(key => {
+                        const city = CITIES[key] || { name: key, flag: "🌐", country: "Saved" };
+                        return `
+                            <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                                <div class="flex items-center space-x-2 cursor-pointer" onclick="loadCity('${key}'); toggleFavModal();">
+                                    <span>${city.flag}</span>
+                                    <span class="font-bold text-slate-800 text-sm">${city.name}</span>
+                                </div>
+                                <button onclick="removeFav('${key}')" class="text-slate-400 hover:text-red-500">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+                    window.lucide?.createIcons();
+                }
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function removeFav(key) {
+            favorites = favorites.filter(k => k !== key);
+            localStorage.setItem("saved_cities_list", JSON.stringify(favorites));
+            updateFavBadge();
+            updateBookmarkBtn();
+            toggleFavModal();
+            toggleFavModal();
+        }
+    </script>
+</body>
+</html>

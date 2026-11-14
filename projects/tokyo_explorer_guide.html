@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tokyo Explorer - Ultimate Travel & Culture Guide</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tokyo: {
+                            red: '#E60012',
+                            crimson: '#C2000E',
+                            dark: '#121216',
+                            card: '#1C1C24',
+                            gold: '#D4AF37',
+                            cherry: '#FFB7C5'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet.js CSS and JS for Interactive Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    
+    <!-- Custom CSS styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .japanese-font {
+            font-family: "Hiragino Sans", "Meiryo", sans-serif;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E60012;
+            border-radius: 4px;
+        }
+        /* Leaflet custom styling */
+        #tokyo-map {
+            width: 100%;
+            height: 520px;
+            min-height: 520px;
+            border-radius: 1rem;
+            z-index: 10;
+        }
+        .leaflet-popup-content-wrapper {
+            background: #1C1C24 !important;
+            color: #ffffff !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(230, 0, 18, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .leaflet-popup-tip {
+            background: #1C1C24 !important;
+        }
+        .light .leaflet-popup-content-wrapper {
+            background: #ffffff !important;
+            color: #111827 !important;
+            border: 1px solid #E5E7EB;
+        }
+        .light .leaflet-popup-tip {
+            background: #ffffff !important;
+        }
+        /* Glassmorphism */
+        .glass-nav {
+            background: rgba(18, 18, 22, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .light .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+        }
+        /* Hero background gradient pattern */
+        .hero-pattern {
+            background-color: #121216;
+            background-image: radial-gradient(rgba(230, 0, 18, 0.15) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        /* Sakura petal animation */
+        .sakura-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .petal {
+            position: absolute;
+            background: #FFB7C5;
+            border-radius: 150% 0 150% 0;
+            opacity: 0.7;
+            animation: animatePetal 10s linear infinite;
+        }
+        @keyframes animatePetal {
+            0% {
+                top: -10%;
+                transform: translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                top: 110%;
+                transform: translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-tokyo-dark text-gray-100 min-h-screen flex flex-col antialiased transition-colors duration-300 dark">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 glass-nav border-b border-gray-800 dark:border-gray-800/80 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('overview')">
+                    <div class="w-10 h-10 rounded-full bg-tokyo-red flex items-center justify-center text-white shadow-lg shadow-tokyo-red/40 font-bold text-xl relative">
+                        <span class="absolute -top-1 -right-1 text-xs">🌸</span>
+                        東
+                    </div>
+                    <div>
+                        <span class="text-2xl font-black tracking-wider text-gray-900 dark:text-white uppercase font-serif">TOKYO<span class="text-tokyo-red">.</span></span>
+                        <span class="block text-xs text-tokyo-red tracking-widest font-semibold uppercase">東京 観光ガイド</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+                    <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 bg-tokyo-red text-white shadow-md shadow-tokyo-red/20">
+                        <i class="fa-solid fa-compass"></i>
+                        <span>Overview</span>
+                    </button>
+                    <button onclick="switchTab('attractions')" id="nav-attractions" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-tokyo-red hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 flex items-center space-x-2">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>Districts</span>
+                    </button>
+                    <button onclick="switchTab('map')" id="nav-map" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-tokyo-red hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 flex items-center space-x-2">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span>Interactive Map</span>
+                    </button>
+                    <button onclick="switchTab('food')" id="nav-food" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-tokyo-red hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 flex items-center space-x-2">
+                        <i class="fa-solid fa-bowl-food"></i>
+                        <span>Food & Dining</span>
+                    </button>
+                    <button onclick="switchTab('video')" id="nav-video" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-tokyo-red hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 flex items-center space-x-2">
+                        <i class="fa-solid fa-video"></i>
+                        <span>Videos & Tips</span>
+                    </button>
+                </nav>
+
+                <!-- Actions: Dark Mode Toggle & Saved Items -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <button id="favorite-btn" onclick="openFavoritesModal()" class="relative p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-tokyo-red transition-all">
+                        <i class="fa-solid fa-heart text-lg"></i>
+                        <span id="fav-count" class="absolute -top-1 -right-1 bg-tokyo-red text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center scale-0 transition-transform">0</span>
+                    </button>
+                    <button id="theme-toggle" class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-tokyo-red transition-all">
+                        <i class="fa-solid fa-sun text-lg hidden dark:block text-yellow-400"></i>
+                        <i class="fa-solid fa-moon text-lg block dark:hidden text-indigo-600"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="flex items-center space-x-2 md:hidden">
+                    <button id="theme-toggle-mobile" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                        <i class="fa-solid fa-sun dark:block hidden text-yellow-400"></i>
+                        <i class="fa-solid fa-moon block dark:hidden text-indigo-600"></i>
+                    </button>
+                    <button id="mobile-menu-btn" class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-tokyo-red">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Drawer -->
+        <div id="mobile-drawer" class="hidden md:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 pt-2 pb-6 space-y-2">
+            <button onclick="switchTab('overview')" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center space-x-3 hover:bg-gray-100 dark:hover:bg-gray-800">
+                <i class="fa-solid fa-compass text-tokyo-red"></i>
+                <span>1. Overview & Culture</span>
+            </button>
+            <button onclick="switchTab('attractions')" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center space-x-3 hover:bg-gray-100 dark:hover:bg-gray-800">
+                <i class="fa-solid fa-location-dot text-tokyo-red"></i>
+                <span>2. Top Districts</span>
+            </button>
+            <button onclick="switchTab('map')" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center space-x-3 hover:bg-gray-100 dark:hover:bg-gray-800">
+                <i class="fa-solid fa-map-location-dot text-tokyo-red"></i>
+                <span>3. Interactive Map</span>
+            </button>
+            <button onclick="switchTab('food')" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center space-x-3 hover:bg-gray-100 dark:hover:bg-gray-800">
+                <i class="fa-solid fa-bowl-food text-tokyo-red"></i>
+                <span>4. Food & Dining</span>
+            </button>
+            <button onclick="switchTab('video')" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center space-x-3 hover:bg-gray-100 dark:hover:bg-gray-800">
+                <i class="fa-solid fa-video text-tokyo-red"></i>
+                <span>5. Videos & Travel Tips</span>
+            </button>
+            <button onclick="openFavoritesModal()" class="w-full text-left px-4 py-3 rounded-lg font-medium flex items-center space-x-3 hover:bg-gray-100 dark:hover:bg-gray-800 text-tokyo-red">
+                <i class="fa-solid fa-heart"></i>
+                <span>Saved Spots</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Content Area -->
+    <main class="flex-grow">
+
+        <!-- TAB 1: OVERVIEW & CULTURE -->
+        <section id="tab-overview" class="tab-content transition-opacity duration-300">
+            <!-- Hero Banner -->
+            <div class="relative min-h-[500px] lg:min-h-[600px] flex items-center justify-center overflow-hidden bg-gray-900 text-white hero-pattern">
+                <div class="absolute inset-0 z-0 opacity-40 mix-blend-overlay">
+                    <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=2000&q=80" alt="Tokyo Skytree Skyline" class="w-full h-full object-cover">
+                </div>
+                <div class="sakura-container" id="sakura-box"></div>
+
+                <div class="relative z-20 max-w-5xl mx-auto px-4 text-center space-y-6">
+                    <div class="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-tokyo-red/20 border border-tokyo-red/40 text-tokyo-red text-sm font-semibold uppercase tracking-widest backdrop-blur-md">
+                        <span>🇯🇵 Welcome to Japan's Capital</span>
+                    </div>
+                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight font-serif leading-tight">
+                        Discover The Soul Of <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-tokyo-red via-red-400 to-pink-500">TOKYO</span>
+                    </h1>
+                    <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-300 font-light leading-relaxed">
+                        A seamless blend of ancient Shinto shrines, neon-lit skyscrapers, world-class gastronomy, and pop culture perfection.
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-4 pt-4">
+                        <button onclick="switchTab('attractions')" class="px-8 py-4 rounded-xl bg-tokyo-red hover:bg-tokyo-crimson text-white font-bold text-lg shadow-lg shadow-tokyo-red/30 transition-all hover:scale-105 flex items-center space-x-2">
+                            <span>Explore Districts</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <button onclick="switchTab('map')" class="px-8 py-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-lg backdrop-blur-md transition-all hover:scale-105 flex items-center space-x-2">
+                            <i class="fa-solid fa-map"></i>
+                            <span>View Interactive Map</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Quick Facts Grid -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-30">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="p-6 rounded-2xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 shadow-xl text-center hover:border-tokyo-red/50 transition-all">
+                        <div class="text-tokyo-red text-3xl mb-2"><i class="fa-solid fa-users"></i></div>
+                        <div class="text-2xl font-extrabold text-gray-900 dark:text-white">37.4M</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mt-1">Metro Population</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 shadow-xl text-center hover:border-tokyo-red/50 transition-all">
+                        <div class="text-tokyo-red text-3xl mb-2"><i class="fa-solid fa-yen-sign"></i></div>
+                        <div class="text-2xl font-extrabold text-gray-900 dark:text-white">Japanese Yen</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mt-1">Currency (JPY / ¥)</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 shadow-xl text-center hover:border-tokyo-red/50 transition-all">
+                        <div class="text-tokyo-red text-3xl mb-2"><i class="fa-solid fa-utensils"></i></div>
+                        <div class="text-2xl font-extrabold text-gray-900 dark:text-white">200+</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mt-1">Michelin Stars</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 shadow-xl text-center hover:border-tokyo-red/50 transition-all">
+                        <div class="text-tokyo-red text-3xl mb-2"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="text-2xl font-extrabold text-gray-900 dark:text-white">Ranked #1</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mt-1">Safest Global Metropolis</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tokyo Introduction & Culture Etiquette -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <span class="text-tokyo-red font-semibold text-sm uppercase tracking-widest">Heritage & Modernity</span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white font-serif">
+                            The Metropolis of Unmatched Contrasts
+                        </h2>
+                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                            Tokyo, officially Tokyo Metropolis, is the capital and largest city of Japan. Located at the head of Tokyo Bay on the Pacific coast of central Honshu, it is the economic, cultural, and political center of the nation.
+                        </p>
+                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                            Whether you are walking through quiet 1,000-year-old temple gardens in Asakusa or crossing the electric, high-energy neon intersections of Shibuya, Tokyo provides an unforgettable journey where futuristic convenience respects centuries-old traditions.
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white flex items-center space-x-2">
+                                    <i class="fa-solid fa-train text-tokyo-red"></i>
+                                    <span>Punctual Transit</span>
+                                </h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Subway trains boast average delays under 30 seconds.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white flex items-center space-x-2">
+                                    <i class="fa-solid fa-tree text-tokyo-red"></i>
+                                    <span>Urban Nature</span>
+                                </h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Lush parks like Yoyogi offer serene escapes.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-tokyo-red to-pink-600 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
+                        <img src="https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=1000&q=80" alt="Shibuya Night Neon" class="relative rounded-2xl shadow-2xl object-cover w-full h-[400px]">
+                    </div>
+                </div>
+
+                <!-- Essential Cultural Etiquette Cards -->
+                <div class="space-y-8">
+                    <div class="text-center max-w-2xl mx-auto">
+                        <span class="text-tokyo-red font-semibold text-sm uppercase tracking-widest">Travel Like A Local</span>
+                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white font-serif mt-2">Essential Tokyo Etiquette</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mt-2">Key cultural rules to keep your journey smooth, polite, and respectful.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="p-6 rounded-2xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 space-y-3">
+                            <div class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 text-tokyo-red flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid fa-ban-smoking"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Public Behavior</h3>
+                            <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                                <li class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>Keep voice low on subways & public transport.</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>Avoid walking while eating street food.</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>Smoke only in designated street smoking zones.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="p-6 rounded-2xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 space-y-3">
+                            <div class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 text-tokyo-red flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid fa-hand-holding-dollar"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">No Tipping Rule</h3>
+                            <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                                <li class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>Tipping is not customary and can cause confusion.</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>High quality service is included by default everywhere.</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>Pass cash with both hands using money trays when provided.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="p-6 rounded-2xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 space-y-3">
+                            <div class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 text-tokyo-red flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid fa-person-walking-arrow-right"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Escalator Manners</h3>
+                            <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                                <li class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>In Tokyo (Kanto), stand on the <strong>left</strong> side.</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>Leave the right side open for commuters walking up.</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>Form organized single lines at train doors.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: TOP ATTRACTIONS & DISTRICTS -->
+        <section id="tab-attractions" class="tab-content hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div class="space-y-2">
+                        <span class="text-tokyo-red font-semibold text-sm uppercase tracking-widest">Neighborhood Guide</span>
+                        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white font-serif">Tokyo's Famous Districts</h1>
+                        <p class="text-gray-500 dark:text-gray-400">Explore each unique hub, from electric tech hubs to historic temple grounds.</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="attraction-search" onkeyup="filterDistricts()" placeholder="Search district or keyword..." class="w-full sm:w-64 pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-tokyo-red transition">
+                        </div>
+                        <select id="district-category" onchange="filterDistricts()" class="px-4 py-3 rounded-xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-tokyo-red transition">
+                            <option value="all">All Vibe Categories</option>
+                            <option value="modern">Modern & Nightlife</option>
+                            <option value="traditional">Traditional & Historic</option>
+                            <option value="pop">Pop Culture & Gaming</option>
+                            <option value="luxury">Luxury & Fashion</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="district-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Shibuya -->
+                    <div class="district-card group bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300" data-category="modern" data-title="shibuya crossing center Street youth fashion nightlife photo spot">
+                        <div class="relative h-60 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80" alt="Shibuya Crossing" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <span class="absolute top-4 left-4 bg-tokyo-red text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Youth & Nightlife</span>
+                            <button onclick="toggleFavorite('Shibuya District')" class="fav-icon-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-tokyo-red text-white flex items-center justify-center backdrop-blur-sm transition">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Shibuya</h3>
+                                <span class="text-xs text-tokyo-red font-bold uppercase tracking-widest">渋谷</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                Famous for Shibuya Scramble Crossing, Hachiko Statue, and Shibuya Sky observatory. The beating heart of Tokyo's trendsetting youth fashion and night entertainment.
+                            </p>
+                            <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <span><i class="fa-solid fa-star text-yellow-400 mr-1"></i> Must-Visit Spot</span>
+                                <button onclick="focusOnMap(35.6595, 139.7004, 'Shibuya Crossing')" class="text-tokyo-red font-semibold hover:underline flex items-center space-x-1">
+                                    <span>Show Map</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shinjuku -->
+                    <div class="district-card group bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300" data-category="modern" data-title="shinjuku kabukicho golden gai skyscraper view station kabukicho">
+                        <div class="relative h-60 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80" alt="Shinjuku Night" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <span class="absolute top-4 left-4 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Skyscrapers & Neon</span>
+                            <button onclick="toggleFavorite('Shinjuku District')" class="fav-icon-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-tokyo-red text-white flex items-center justify-center backdrop-blur-sm transition">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Shinjuku</h3>
+                                <span class="text-xs text-tokyo-red font-bold uppercase tracking-widest">新宿</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                Home to the world's busiest railway station, Golden Gai alleyways, Tokyo Metropolitan Government Building observation decks, and Kabukicho's Godzilla street.
+                            </p>
+                            <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <span><i class="fa-solid fa-city mr-1"></i> Entertainment Hub</span>
+                                <button onclick="focusOnMap(35.6938, 139.7034, 'Shinjuku District')" class="text-tokyo-red font-semibold hover:underline flex items-center space-x-1">
+                                    <span>Show Map</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Asakusa -->
+                    <div class="district-card group bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300" data-category="traditional" data-title="asakusa sensoji temple kaminarimon gate souvenir street traditional kimonos">
+                        <div class="relative h-60 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=800&q=80" alt="Asakusa Sensoji Temple" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <span class="absolute top-4 left-4 bg-amber-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Traditional Culture</span>
+                            <button onclick="toggleFavorite('Asakusa District')" class="fav-icon-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-tokyo-red text-white flex items-center justify-center backdrop-blur-sm transition">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Asakusa</h3>
+                                <span class="text-xs text-tokyo-red font-bold uppercase tracking-widest">浅草</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                Step back into old Edo Tokyo. Visit Sensō-ji, Tokyo's oldest Buddhist temple, stroll Nakamise shopping street for traditional treats, or ride a rickshaw.
+                            </p>
+                            <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <span><i class="fa-solid fa-place-of-worship mr-1"></i> Edo Atmosphere</span>
+                                <button onclick="focusOnMap(35.7148, 139.7967, 'Sensō-ji Temple')" class="text-tokyo-red font-semibold hover:underline flex items-center space-x-1">
+                                    <span>Show Map</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Akihabara -->
+                    <div class="district-card group bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300" data-category="pop" data-title="akihabara electric town anime manga gaming arcade maid cafe electronics">
+                        <div class="relative h-60 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=800&q=80" alt="Akihabara Tech & Anime" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <span class="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Anime & Gaming</span>
+                            <button onclick="toggleFavorite('Akihabara District')" class="fav-icon-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-tokyo-red text-white flex items-center justify-center backdrop-blur-sm transition">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Akihabara</h3>
+                                <span class="text-xs text-tokyo-red font-bold uppercase tracking-widest">秋葉原</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                The world-famous "Electric Town". Mecca for anime fans, video gamers, multi-story retro arcade towers, figurine shops, and specialized electronic components.
+                            </p>
+                            <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <span><i class="fa-solid fa-gamepad mr-1"></i> Otaku Culture</span>
+                                <button onclick="focusOnMap(35.6983, 139.7731, 'Akihabara Electric Town')" class="text-tokyo-red font-semibold hover:underline flex items-center space-x-1">
+                                    <span>Show Map</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Harajuku & Omotesando -->
+                    <div class="district-card group bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300" data-category="luxury" data-title="harajuku takeshita street meiji shrine omotesando fashion crepes street wear">
+                        <div class="relative h-60 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80" alt="Harajuku Takeshita Street" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <span class="absolute top-4 left-4 bg-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Kawaii & Streetwear</span>
+                            <button onclick="toggleFavorite('Harajuku District')" class="fav-icon-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-tokyo-red text-white flex items-center justify-center backdrop-blur-sm transition">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Harajuku</h3>
+                                <span class="text-xs text-tokyo-red font-bold uppercase tracking-widest">原宿</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                Center of Japanese youth culture and extreme fashion along Takeshita Street. Adjacent to serene Meiji Shrine forest and luxury boutiques on Omotesando avenue.
+                            </p>
+                            <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <span><i class="fa-solid fa-shirt mr-1"></i> Fashion Capital</span>
+                                <button onclick="focusOnMap(35.6702, 139.7027, 'Meiji Jingu Shrine')" class="text-tokyo-red font-semibold hover:underline flex items-center space-x-1">
+                                    <span>Show Map</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ginza -->
+                    <div class="district-card group bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300" data-category="luxury" data-title="ginza luxury shopping department stores kabuki theater fine dining">
+                        <div class="relative h-60 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80" alt="Ginza Luxury District" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <span class="absolute top-4 left-4 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Luxury Shopping</span>
+                            <button onclick="toggleFavorite('Ginza District')" class="fav-icon-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-tokyo-red text-white flex items-center justify-center backdrop-blur-sm transition">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Ginza</h3>
+                                <span class="text-xs text-tokyo-red font-bold uppercase tracking-widest">銀座</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                Tokyo's premier upscale shopping district packed with flagship fashion houses, luxury department stores, Michelin sushi spots, and Kabuki theater.
+                            </p>
+                            <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <span><i class="fa-solid fa-gem mr-1"></i> High End</span>
+                                <button onclick="focusOnMap(35.6719, 139.7640, 'Ginza Shopping District')" class="text-tokyo-red font-semibold hover:underline flex items-center space-x-1">
+                                    <span>Show Map</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: INTERACTIVE MAP & NEIGHBORHOOD EXPLORER -->
+        <section id="tab-map" class="tab-content hidden py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-tokyo-red font-semibold text-sm uppercase tracking-widest">GPS Landmark Navigator</span>
+                        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white font-serif">Tokyo Interactive Map</h1>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterMapMarkers('all', event)" class="map-filter-btn active bg-tokyo-red text-white px-4 py-2 rounded-xl text-sm font-semibold transition">
+                            All Locations
+                        </button>
+                        <button onclick="filterMapMarkers('landmark', event)" class="map-filter-btn bg-gray-100 dark:bg-tokyo-card text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-tokyo-red/20 transition">
+                            🗼 Landmarks
+                        </button>
+                        <button onclick="filterMapMarkers('shrine', event)" class="map-filter-btn bg-gray-100 dark:bg-tokyo-card text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-tokyo-red/20 transition">
+                            ⛩️ Shrines & Temples
+                        </button>
+                        <button onclick="filterMapMarkers('shopping', event)" class="map-filter-btn bg-gray-100 dark:bg-tokyo-card text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-tokyo-red/20 transition">
+                            🛍️ Shopping & Tech
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div class="lg:col-span-3 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xl relative bg-gray-900">
+                        <div id="tokyo-map"></div>
+                    </div>
+
+                    <div class="bg-white dark:bg-tokyo-card p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg space-y-4 max-h-[520px] overflow-y-auto">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-list-check text-tokyo-red"></i>
+                            <span>Key Locations</span>
+                        </h3>
+                        <div id="map-landmark-list" class="space-y-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: FOOD & DINING GUIDE -->
+        <section id="tab-food" class="tab-content hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                <div class="text-center max-w-3xl mx-auto space-y-3">
+                    <span class="text-tokyo-red font-semibold text-sm uppercase tracking-widest">Culinary Paradise</span>
+                    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white font-serif">Tokyo Culinary Experience</h1>
+                    <p class="text-gray-600 dark:text-gray-300">From 3-star Michelin dining to late-night street food stalls beneath train tracks.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Tokyo Ramen -->
+                    <div class="bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-md hover:shadow-xl transition space-y-4 p-6">
+                        <div class="h-48 rounded-xl overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80" alt="Tokyo Ramen" class="w-full h-full object-cover">
+                            <span class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white text-xs px-3 py-1 rounded-md font-bold">Comfort Food</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Tokyo Shoyu Ramen</h3>
+                                <span class="text-tokyo-red font-bold">ラーメン</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm">
+                                Clear soy sauce-based dashi broth paired with springy noodles, chashu pork belly, bamboo shoots, and a soft-boiled marinated egg.
+                            </p>
+                            <div class="pt-2 text-xs font-semibold text-tokyo-red">
+                                💡 Best spot: Tokyo Station Ramen Street
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edomae Sushi -->
+                    <div class="bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-md hover:shadow-xl transition space-y-4 p-6">
+                        <div class="h-48 rounded-xl overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80" alt="Fresh Edomae Sushi" class="w-full h-full object-cover">
+                            <span class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white text-xs px-3 py-1 rounded-md font-bold">World Famous</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Edomae Nigiri Sushi</h3>
+                                <span class="text-tokyo-red font-bold">江戸前寿司</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm">
+                                World-famous sushi style developed in Edo (Tokyo). Freshly sliced raw fish pressed over seasoned vinegared rice.
+                            </p>
+                            <div class="pt-2 text-xs font-semibold text-tokyo-red">
+                                💡 Best spot: Toyosu Outer Market & Ginza
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monjayaki -->
+                    <div class="bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-md hover:shadow-xl transition space-y-4 p-6">
+                        <div class="h-48 rounded-xl overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=800&q=80" alt="Japanese Savory Pancake Monjayaki" class="w-full h-full object-cover">
+                            <span class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white text-xs px-3 py-1 rounded-md font-bold">Local Speciality</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Monjayaki</h3>
+                                <span class="text-tokyo-red font-bold">もんじゃ焼き</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm">
+                                Tokyo's liquid savory pan dish cooked directly on a hot teppan grill. Crispy on the edges, warm and flavorful in the center.
+                            </p>
+                            <div class="pt-2 text-xs font-semibold text-tokyo-red">
+                                💡 Best spot: Tsukishima Monja Street
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Travel Budget Estimator Widget -->
+                <div class="p-8 rounded-3xl bg-gradient-to-r from-tokyo-dark via-gray-900 to-tokyo-card border border-tokyo-red/30 shadow-2xl text-white space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <span class="text-tokyo-red font-bold text-xs uppercase tracking-widest">Planner Tool</span>
+                            <h2 class="text-2xl font-bold font-serif">Tokyo Daily Budget Calculator</h2>
+                            <p class="text-gray-400 text-sm">Estimate daily meals, transit, and accommodation expenses in Yen (¥) & USD ($).</p>
+                        </div>
+                        <div class="text-right bg-tokyo-red/20 border border-tokyo-red/40 px-6 py-3 rounded-2xl">
+                            <span class="text-xs text-gray-300 uppercase block font-semibold">Est. Daily Budget</span>
+                            <span id="budget-total" class="text-3xl font-extrabold text-tokyo-red">¥15,500</span>
+                            <span id="budget-usd" class="text-xs text-gray-400 block font-medium font-mono">~$105 USD</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-gray-800">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Travel Style</label>
+                            <select id="budget-style" onchange="calculateBudget()" class="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-tokyo-red">
+                                <option value="budget">Backpacker / Budget (Hostels & Conbini)</option>
+                                <option value="moderate" selected>Mid-range Tourist (3★ Hotel & Izakayas)</option>
+                                <option value="luxury">Luxury Traveler (5★ Hotel & Michelin Dining)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Days Staying</label>
+                            <input type="number" id="budget-days" value="5" min="1" max="30" onchange="calculateBudget()" class="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-tokyo-red">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Pass Type</label>
+                            <select id="budget-pass" onchange="calculateBudget()" class="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-tokyo-red">
+                                <option value="subway">Tokyo Subway 72hr Unlimited Pass</option>
+                                <option value="ic">IC Card (Suica / Pasmo Pay-As-You-Go)</option>
+                                <option value="jr">JR Tokyo Wide Pass</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: VIDEO SHOWCASE & TRAVEL TIPS -->
+        <section id="tab-video" class="tab-content hidden py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                <div class="space-y-3">
+                    <span class="text-tokyo-red font-semibold text-sm uppercase tracking-widest">Visual Journeys & Survival Kit</span>
+                    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white font-serif">Tokyo Video Showcase & Tips</h1>
+                    <p class="text-gray-600 dark:text-gray-300">Immerse yourself in 4K city walks and learn essential travel tips before boarding your flight.</p>
+                </div>
+
+                <!-- Video Showcase Grid (Updated Embeds) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Video Embed Card 1 -->
+                    <div class="bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xl space-y-4 p-4">
+                        <div class="relative w-full aspect-video rounded-xl overflow-hidden shadow-inner bg-black">
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/a341E26J86U?rel=0" title="Tokyo Walking Tour Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+                        </div>
+                        <div class="px-2 pb-2">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Tokyo 4K Night Walking Tour</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Experience the mesmerizing neon lights, vibrant crowds, and atmospheric alleyways of Shibuya and Shinjuku at night.</p>
+                        </div>
+                    </div>
+
+                    <!-- Video Embed Card 2 -->
+                    <div class="bg-white dark:bg-tokyo-card rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xl space-y-4 p-4">
+                        <div class="relative w-full aspect-video rounded-xl overflow-hidden shadow-inner bg-black">
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/6DQ-L-5f400?rel=0" title="Tokyo Guide Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+                        </div>
+                        <div class="px-2 pb-2">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Top 10 Things To Do In Tokyo</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">A complete travel guide covering hidden gems, food markets, temple rituals, and logistics for first-time visitors.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Essential Japanese Phrases -->
+                    <div class="p-6 rounded-2xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 space-y-4">
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-3">
+                            <i class="fa-solid fa-language text-tokyo-red"></i>
+                            <span>Essential Phrases for Tourists</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                                <div>
+                                    <span class="font-bold text-gray-900 dark:text-white block">Konnichiwa (こんにちは)</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Hello / Good afternoon</span>
+                                </div>
+                                <span class="text-xs font-mono bg-tokyo-red/20 text-tokyo-red px-2 py-1 rounded">Greeting</span>
+                            </div>
+
+                            <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                                <div>
+                                    <span class="font-bold text-gray-900 dark:text-white block">Arigatou Gozaimasu (ありがとうございます)</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Thank you very much</span>
+                                </div>
+                                <span class="text-xs font-mono bg-tokyo-red/20 text-tokyo-red px-2 py-1 rounded">Polite</span>
+                            </div>
+
+                            <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                                <div>
+                                    <span class="font-bold text-gray-900 dark:text-white block">Sumimasen (すみません)</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Excuse me / Sorry</span>
+                                </div>
+                                <span class="text-xs font-mono bg-tokyo-red/20 text-tokyo-red px-2 py-1 rounded">Essential</span>
+                            </div>
+
+                            <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                                <div>
+                                    <span class="font-bold text-gray-900 dark:text-white block">Kore o kudasai (これをください)</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Please give me this (Ordering food/item)</span>
+                                </div>
+                                <span class="text-xs font-mono bg-tokyo-red/20 text-tokyo-red px-2 py-1 rounded">Dining</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transit Cards & Metro Survival -->
+                    <div class="p-6 rounded-2xl bg-white dark:bg-tokyo-card border border-gray-200 dark:border-gray-800 space-y-4">
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-3">
+                            <i class="fa-solid fa-train-subway text-tokyo-red"></i>
+                            <span>Public Transport Hacks</span>
+                        </h3>
+                        <div class="space-y-4 text-sm text-gray-600 dark:text-gray-300">
+                            <div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/30 space-y-1">
+                                <h4 class="font-bold text-gray-900 dark:text-white">💳 Get a Digital Suica / Pasmo Card</h4>
+                                <p>Add Suica directly to your Apple Wallet or Google Pay on your mobile phone for seamless contactless fare taps at all subway gates.</p>
+                            </div>
+
+                            <div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/30 space-y-1">
+                                <h4 class="font-bold text-gray-900 dark:text-white">⭕ Master the JR Yamanote Loop Line</h4>
+                                <p>The green JR Yamanote train line loops around Tokyo's entire core, directly connecting Shibuya, Shinjuku, Tokyo Station, Akihabara, and Ueno.</p>
+                            </div>
+
+                            <div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/30 space-y-1">
+                                <h4 class="font-bold text-gray-900 dark:text-white">📱 Useful Navigation Apps</h4>
+                                <p>Download <strong>Google Maps</strong> or <strong>Japan Travel by NAVITIME</strong> for real-time train exit guidance and platform numbers.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 text-gray-400 py-12 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('overview')">
+                    <div class="w-8 h-8 rounded-full bg-tokyo-red flex items-center justify-center text-white font-bold">東</div>
+                    <span class="text-xl font-bold text-white font-serif tracking-wider">TOKYO EXPLORER</span>
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm">
+                    <button onclick="switchTab('overview')" class="hover:text-tokyo-red transition">Overview</button>
+                    <button onclick="switchTab('attractions')" class="hover:text-tokyo-red transition">Districts</button>
+                    <button onclick="switchTab('map')" class="hover:text-tokyo-red transition">Interactive Map</button>
+                    <button onclick="switchTab('food')" class="hover:text-tokyo-red transition">Food</button>
+                    <button onclick="switchTab('video')" class="hover:text-tokyo-red transition">Videos & Tips</button>
+                </div>
+                <div class="text-xs text-gray-500">
+                    &copy; 2026 Tokyo Explorer Portal. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Favorites Modal -->
+    <div id="favorites-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-tokyo-card w-full max-w-lg rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-800 pb-3">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-heart text-tokyo-red"></i>
+                    <span>Your Saved Spots</span>
+                </h3>
+                <button onclick="closeFavoritesModal()" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <div id="favorites-list" class="space-y-2 max-h-60 overflow-y-auto">
+                <p class="text-sm text-gray-500 text-center py-4">No spots bookmarked yet! Click the heart icons on district cards.</p>
+            </div>
+            <div class="pt-2 text-right">
+                <button onclick="closeFavoritesModal()" class="px-5 py-2 rounded-xl bg-tokyo-red text-white text-sm font-semibold">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* Global State */
+        let map = null;
+        let mapMarkers = [];
+        let favorites = [];
+        try {
+            const saved = JSON.parse(localStorage.getItem('tokyo-explorer-favorites'));
+            if (Array.isArray(saved)) favorites = saved.filter(name =>
+                Array.from(document.querySelectorAll('[onclick^="toggleFavorite("]')).some(
+                    button => button.getAttribute('onclick') === "toggleFavorite('" + name + "')"
+                )
+            );
+        } catch {}
+
+        // Key Landmarks Data with coordinates for Leaflet
+        const landmarksData = [
+            { id: 1, name: "Tokyo Tower", lat: 35.6586, lng: 139.7454, category: "landmark", desc: "Iconic Eiffel-inspired communications tower with panoramic observation decks." },
+            { id: 2, name: "Sensō-ji Temple", lat: 35.7148, lng: 139.7967, category: "shrine", desc: "Tokyo's oldest and most famous ancient Buddhist temple in Asakusa." },
+            { id: 3, name: "Shibuya Scramble Crossing", lat: 35.6595, lng: 139.7004, category: "shopping", desc: "The world's busiest pedestrian intersection illuminated by giant LED screens." },
+            { id: 4, name: "Meiji Jingu Shrine", lat: 35.6702, lng: 139.7027, category: "shrine", desc: "Serene Shinto shrine dedicated to Emperor Meiji surrounded by 170 acres of forest." },
+            { id: 5, name: "Tokyo Skytree", lat: 35.7101, lng: 139.8107, category: "landmark", desc: "Tallest structure in Japan standing at 634 meters high." },
+            { id: 6, name: "Tokyo Imperial Palace", lat: 35.6852, lng: 139.7528, category: "landmark", desc: "Primary residence of the Emperor of Japan with majestic gardens and moat." },
+            { id: 7, name: "Akihabara Electric Town", lat: 35.6983, lng: 139.7731, category: "shopping", desc: "World hub for video games, anime goods, and specialized electronics." }
+        ];
+
+        /* Window Initialization */
+        window.addEventListener('DOMContentLoaded', () => {
+            initSakura();
+            initTheme();
+            if (window.L) initMap();
+            renderLandmarkList(landmarksData);
+            calculateBudget();
+            updateFavoriteCount();
+        });
+
+        /* Tab Navigation Switcher */
+        function switchTab(tabId) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.add('hidden'));
+
+            // Show target tab
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+
+            // Update nav active styles
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => {
+                btn.classList.remove('bg-tokyo-red', 'text-white', 'shadow-md', 'shadow-tokyo-red/20');
+                btn.classList.add('text-gray-700', 'dark:text-gray-300');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-tokyo-red', 'text-white', 'shadow-md', 'shadow-tokyo-red/20');
+                activeBtn.classList.remove('text-gray-700', 'dark:text-gray-300');
+            }
+
+            // Close mobile drawer if open
+            document.getElementById('mobile-drawer').classList.add('hidden');
+
+            // Trigger Map Resize recalculation if map tab opened
+            if (tabId === 'map') {
+                if (!map) {
+                    initMap();
+                } else {
+                    setTimeout(() => {
+                        map?.invalidateSize();
+                    }, 100);
+                }
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* Sakura Floating Petal Effect Generator */
+        function initSakura() {
+            const container = document.getElementById('sakura-box');
+            if (!container) return;
+            for (let i = 0; i < 20; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.style.left = Math.random() * 100 + '%';
+                petal.style.width = (Math.random() * 10 + 8) + 'px';
+                petal.style.height = (Math.random() * 10 + 8) + 'px';
+                petal.style.animationDuration = (Math.random() * 6 + 6) + 's';
+                petal.style.animationDelay = (Math.random() * 5) + 's';
+                container.appendChild(petal);
+            }
+        }
+
+        /* Dark / Light Theme Toggle */
+        function initTheme() {
+            const themeBtn = document.getElementById('theme-toggle');
+            const themeBtnMobile = document.getElementById('theme-toggle-mobile');
+
+            const toggle = () => {
+                const isDark = document.body.classList.toggle('dark');
+                document.documentElement.classList.toggle('dark', isDark);
+            };
+
+            if (themeBtn) themeBtn.addEventListener('click', toggle);
+            if (themeBtnMobile) themeBtnMobile.addEventListener('click', toggle);
+        }
+
+        /* Mobile Menu Toggle */
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const drawer = document.getElementById('mobile-drawer');
+            drawer.classList.toggle('hidden');
+        });
+
+        /* Leaflet Interactive Map Logic */
+        function initMap() {
+            if (!window.L) return;
+            const mapContainer = document.getElementById('tokyo-map');
+            if (!mapContainer || map) return;
+
+            map = L.map('tokyo-map', {
+                center: [35.6812, 139.7671],
+                zoom: 12,
+                zoomControl: true
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            addMapMarkers(landmarksData);
+        }
+
+        function addMapMarkers(data) {
+            if (!map) return;
+            mapMarkers.forEach(m => map.removeLayer(m));
+            mapMarkers = [];
+
+            data.forEach(item => {
+                const marker = L.marker([item.lat, item.lng]).addTo(map);
+                marker.bindPopup(`
+                    <div class="p-2 space-y-1">
+                        <h4 class="font-bold text-base text-tokyo-red">${item.name}</h4>
+                        <p class="text-xs text-gray-300">${item.desc}</p>
+                    </div>
+                `);
+                marker.category = item.category;
+                mapMarkers.push(marker);
+            });
+        }
+
+        function filterMapMarkers(category, event) {
+            const buttons = document.querySelectorAll('.map-filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-tokyo-red', 'text-white');
+                btn.classList.add('bg-gray-100', 'dark:bg-tokyo-card', 'text-gray-700', 'dark:text-gray-300');
+            });
+
+            if (event && event.target) {
+                event.target.classList.add('bg-tokyo-red', 'text-white');
+                event.target.classList.remove('bg-gray-100', 'dark:bg-tokyo-card', 'text-gray-700', 'dark:text-gray-300');
+            }
+
+            const filtered = category === 'all' ? landmarksData : landmarksData.filter(d => d.category === category);
+            addMapMarkers(filtered);
+            renderLandmarkList(filtered);
+        }
+
+        function renderLandmarkList(items) {
+            const container = document.getElementById('map-landmark-list');
+            if (!container) return;
+
+            container.innerHTML = items.map(item => `
+                <div onclick="focusOnMap(${item.lat}, ${item.lng}, '${item.name}')" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 hover:bg-tokyo-red/10 border border-gray-200 dark:border-gray-700 cursor-pointer transition flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-sm text-gray-900 dark:text-white block">${item.name}</span>
+                        <span class="text-xs text-gray-500 capitalize">${item.category}</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-tokyo-red"></i>
+                </div>
+            `).join('');
+        }
+
+        function focusOnMap(lat, lng, name) {
+            switchTab('map');
+            setTimeout(() => {
+                if (map) {
+                    map?.invalidateSize();
+                    map.setView([lat, lng], 15);
+                    mapMarkers.forEach(marker => {
+                        const pos = marker.getLatLng();
+                        if (Math.abs(pos.lat - lat) < 0.001 && Math.abs(pos.lng - lng) < 0.001) {
+                            marker.openPopup();
+                        }
+                    });
+                }
+            }, 150);
+        }
+
+        /* Filter District Cards by Search & Dropdown Category */
+        function filterDistricts() {
+            const query = document.getElementById('attraction-search').value.toLowerCase();
+            const category = document.getElementById('district-category').value;
+            const cards = document.querySelectorAll('.district-card');
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                const cardCat = card.getAttribute('data-category');
+
+                const matchesSearch = title.includes(query);
+                const matchesCat = (category === 'all' || cardCat === category);
+
+                if (matchesSearch && matchesCat) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        /* Budget Estimator Calculation */
+        function calculateBudget() {
+            const style = document.getElementById('budget-style').value;
+            const days = parseInt(document.getElementById('budget-days').value) || 1;
+            const pass = document.getElementById('budget-pass').value;
+
+            let dailyBase = 10000;
+            if (style === 'budget') dailyBase = 7000;
+            if (style === 'luxury') dailyBase = 35000;
+
+            let passCost = 0;
+            if (pass === 'subway') passCost = 1500 / 3;
+            if (pass === 'jr') passCost = 10000 / 3;
+
+            const totalDaily = dailyBase + passCost;
+            const grandTotal = totalDaily * days;
+            const usdTotal = Math.round(grandTotal / 148);
+
+            document.getElementById('budget-total').textContent = `¥${grandTotal.toLocaleString()}`;
+            document.getElementById('budget-usd').textContent = `~$${usdTotal.toLocaleString()} USD (${days} days total)`;
+        }
+
+        /* Bookmark Favorites Manager */
+        function toggleFavorite(spotName) {
+            const index = favorites.indexOf(spotName);
+            if (index === -1) {
+                favorites.push(spotName);
+            } else {
+                favorites.splice(index, 1);
+            }
+
+            try { localStorage.setItem('tokyo-explorer-favorites', JSON.stringify(favorites)); } catch {}
+            updateFavoriteCount();
+            renderFavoritesModal();
+        }
+
+        function updateFavoriteCount() {
+            const countBadge = document.getElementById('fav-count');
+            countBadge.textContent = favorites.length;
+            if (favorites.length > 0) {
+                countBadge.classList.remove('scale-0');
+            } else {
+                countBadge.classList.add('scale-0');
+            }
+
+        }
+
+        function renderFavoritesModal() {
+            const container = document.getElementById('favorites-list');
+            if (favorites.length === 0) {
+                container.innerHTML = `<p class="text-sm text-gray-500 text-center py-4">No spots bookmarked yet! Click the heart icons on district cards.</p>`;
+                return;
+            }
+
+            container.innerHTML = favorites.map(item => `
+                <div class="flex justify-between items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    <span class="font-bold text-gray-900 dark:text-white text-sm">${item}</span>
+                    <button onclick="toggleFavorite('${item}')" class="text-tokyo-red hover:text-red-700 text-sm">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function openFavoritesModal() {
+            document.getElementById('favorites-modal').classList.remove('hidden');
+        }
+
+        function closeFavoritesModal() {
+            document.getElementById('favorites-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

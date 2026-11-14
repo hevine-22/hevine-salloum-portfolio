@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Sajj Traditional Lebanese Bakery</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        terracotta: {
+                            50: '#fdf8f6',
+                            100: '#f2e8e5',
+                            500: '#d95338',
+                            600: '#c0392b',
+                            700: '#9b2c1f',
+                        },
+                        olive: {
+                            50: '#f5f7f2',
+                            500: '#6b8e23',
+                            600: '#556b2f',
+                            700: '#3e4f21',
+                        },
+                        sesame: {
+                            50: '#fcfaf7',
+                            100: '#f5f0e6',
+                            200: '#e6d7bf',
+                            800: '#4a3f35',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c0392b;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9b2c1f;
+        }
+    </style>
+</head>
+<body class="bg-sesame-50 text-stone-800 antialiased selection:bg-terracotta-500 selection:text-white font-sans flex flex-col min-h-screen">
+
+    <nav class="sticky top-0 z-30 bg-stone-900/95 backdrop-blur-md text-white border-b border-stone-800 transition-all duration-300 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-terracotta-500 to-amber-600 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fa-solid font-bold text-xl fa-fire-burner"></i>
+                    </div>
+                    <div>
+                        <span class="font-serif font-bold text-2xl tracking-wide bg-gradient-to-r from-amber-200 to-orange-400 bg-clip-text text-transparent">AL-SAJJ</span>
+                        <span class="block text-xs text-stone-400 tracking-widest uppercase">Bakery & Grill</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Nav Links -->
+                <div class="hidden md:flex items-center space-x-8 font-medium">
+                    <a href="#about" class="text-stone-300 hover:text-amber-400 transition-colors">Our Story</a>
+                    <a href="#menu" class="text-stone-300 hover:text-amber-400 transition-colors">Menu</a>
+                    <a href="#contact" class="text-stone-300 hover:text-amber-400 transition-colors">Location & Hours</a>
+                </div>
+
+                <!-- Floating Cart Trigger -->
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleCart()" class="relative bg-terracotta-600 hover:bg-terracotta-500 text-white px-5 py-2.5 rounded-full font-bold flex items-center gap-3 transition-all duration-300 shadow-md hover:shadow-terracotta-600/30 active:scale-95">
+                        <i class="fa-solid fa-basket-shopping text-lg"></i>
+                        <span class="hidden sm:inline">Your Order</span>
+                        <span id="cart-badge" class="bg-amber-400 text-stone-900 font-extrabold text-xs w-6 h-6 rounded-full flex items-center justify-center animate-pulse">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header id="about" class="relative bg-stone-900 text-white overflow-hidden py-16 lg:py-24">
+        <!-- Background Decorative Elements -->
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#d95338_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-terracotta-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-olive-500/20 rounded-full blur-3xl"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div class="space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs sm:text-sm font-semibold">
+                        <i class="fa-solid fa-wheat-awn"></i> Authentic Wood-Fired Lebanese Flatbreads
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-serif font-extrabold leading-tight tracking-tight text-stone-100">
+                        Hot, Fresh & Crisp directly off the <span class="text-terracotta-500 underline decoration-amber-400 decoration-wavy underline-offset-8">Sajj</span>.
+                    </h1>
+                    <p class="text-stone-300 text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
+                        Crafted using time-honored artisanal Lebanese traditions. Our dough is hand-stretched paper-thin and baked live over our classic convex domed griddle for an unforgettable crisp and rich aroma.
+                    </p>
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                        <a href="#menu" class="w-full sm:w-auto px-8 py-4 bg-terracotta-600 hover:bg-terracotta-500 text-white font-bold rounded-xl shadow-lg transition-all text-center flex items-center justify-center gap-2">
+                            <span>Explore Menu & Order</span>
+                            <i class="fa-solid fa-arrow-down text-sm"></i>
+                        </a>
+                        <a href="#contact" class="w-full sm:w-auto px-8 py-4 bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 font-semibold rounded-xl transition-all text-center">
+                            Find Our Bakery
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Image Showcase -->
+                <div class="relative flex justify-center">
+                    <div class="relative w-full max-w-md lg:max-w-none">
+                        <img src="https://images.unsplash.com/photo-1541518763669-27fef04b14da?auto=format&fit=crop&w=1000&q=80" alt="Fresh Lebanese Sajj Flatbread" class="rounded-3xl shadow-2xl object-cover h-80 sm:h-96 w-full border-4 border-stone-800" onerror="this.onerror=null; this.src='https://placehold.co/800x600/333333/FFFFFF?text=Authentic+Lebanese+Sajj';">
+                        <!-- Floating Badge -->
+                        <div class="absolute -bottom-6 -left-4 sm:left-6 bg-stone-800/90 backdrop-blur-md p-4 rounded-2xl border border-stone-700 shadow-xl flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-olive-500 flex items-center justify-center text-white text-xl">
+                                <i class="fa-solid fa-leaf"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-stone-400 font-medium">100% Fresh Daily</p>
+                                <p class="text-sm font-bold text-stone-100">Wild Thyme & Virgin Olive Oil</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="menu" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+        <!-- Section Header -->
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="text-terracotta-600 font-bold tracking-widest text-xs uppercase bg-terracotta-100 px-3 py-1 rounded-full">Made to Order</span>
+            <h2 class="text-3xl sm:text-4xl font-serif font-bold text-stone-900 mt-3">Our Menu Selection</h2>
+            <p class="text-stone-600 mt-2">Select your favorite toppings and customize your dough crispy or soft.</p>
+            
+            <!-- Category Filter Buttons -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mt-8" id="category-filters">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- Menu Items Grid -->
+        <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Dynamically populated via JS -->
+        </div>
+    </main>
+
+    <section id="contact" class="bg-stone-900 text-stone-300 py-16 border-t border-stone-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Location & Delivery -->
+                <div class="bg-stone-800/50 p-6 rounded-2xl border border-stone-800 space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-terracotta-600/20 text-terracotta-500 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Bakery Location</h3>
+                    <p class="text-sm text-stone-400">Main Street, Food Quarter District, Beirut, Lebanon</p>
+                    <p class="text-xs text-amber-400 font-medium">Free delivery within 5 km radius!</p>
+                </div>
+
+                <!-- Opening Hours -->
+                <div class="bg-stone-800/50 p-6 rounded-2xl border border-stone-800 space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-olive-500/20 text-olive-500 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Opening Hours</h3>
+                    <p class="text-sm text-stone-400">Monday - Sunday: 7:00 AM - 11:00 PM</p>
+                    <p class="text-xs text-emerald-400 font-medium"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Kitchen Open Now</p>
+                </div>
+
+                <!-- Quick Contact -->
+                <div class="bg-stone-800/50 p-6 rounded-2xl border border-stone-800 space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Connect With Us</h3>
+                    <div class="flex gap-4 pt-1">
+                        
+                        <a href="#" class="w-10 h-10 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center transition-colors">
+                            <i class="fa-brands fa-instagram text-lg"></i>
+                        </a>
+                        <a href="tel:+96181367711" class="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-phone text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 pt-8 border-t border-stone-800 text-center text-xs text-stone-500">
+                &copy; <span id="current-year"></span> Al-Sajj Traditional Lebanese Bakery. Handcrafted with Passion.
+            </div>
+        </div>
+    </section>
+
+    <!-- Drawer Overlay -->
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-stone-950/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300"></div>
+
+    <!-- Slide-over Cart Panel -->
+    <aside id="cart-drawer" class="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white z-50 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
+        <!-- Cart Header -->
+        <div class="p-5 bg-stone-900 text-white flex items-center justify-between border-b border-stone-800">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-terracotta-600 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg leading-none">Your Order Basket</h3>
+                    <span class="text-xs text-stone-400">Review items and preview checkout</span>
+                </div>
+            </div>
+            <button onclick="toggleCart()" class="text-stone-400 hover:text-white p-2 rounded-lg hover:bg-stone-800 transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Cart Items List -->
+        <div id="cart-items-container" class="flex-grow overflow-y-auto p-5 space-y-4 custom-scrollbar">
+            <!-- Dynamically calculated cart items -->
+        </div>
+
+        <!-- Checkout Form & Totals -->
+        <div class="p-5 bg-stone-50 border-t border-stone-200 space-y-4">
+            <!-- Order Type Toggle -->
+            <div class="flex rounded-xl bg-stone-200 p-1">
+                <button id="btn-delivery" onclick="setOrderType('Delivery')" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white text-stone-900 shadow-sm">
+                    <i class="fa-solid fa-motorcycle mr-1"></i> Delivery
+                </button>
+                <button id="btn-pickup" onclick="setOrderType('Pickup')" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all text-stone-600 hover:text-stone-900">
+                    <i class="fa-solid fa-store mr-1"></i> Pickup
+                </button>
+            </div>
+
+            <!-- Customer Details Form -->
+            <div class="space-y-2">
+                <input type="text" id="cust-name" placeholder="Your Full Name *" class="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500">
+                <input type="tel" id="cust-phone" placeholder="Phone Number *" class="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500">
+                <input type="text" id="cust-address" placeholder="Delivery Address or Pickup Time *" class="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500">
+                <textarea id="cust-notes" placeholder="Special Instructions (e.g. Extra toasted, light salt)" rows="2" class="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 resize-none"></textarea>
+            </div>
+
+            <!-- Order Financial Summary -->
+            <div class="space-y-1.5 pt-2 border-t border-stone-200 text-sm">
+                <div class="flex justify-between text-stone-600">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">$0.00</span>
+                </div>
+                <div id="delivery-fee-row" class="flex justify-between text-stone-600">
+                    <span>Delivery Fee</span>
+                    <span id="summary-delivery">$1.50</span>
+                </div>
+                <div class="flex justify-between font-bold text-lg text-stone-900 pt-1 border-t border-stone-200">
+                    <span>Total Amount</span>
+                    <span id="summary-total" class="text-terracotta-600">$0.00</span>
+                </div>
+            </div>
+
+            <!-- Send to WhatsApp Action -->
+            <button onclick="previewOrder()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white py-3.5 px-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all">
+                <i class="fa-brands fa-whatsapp text-2xl"></i>
+                <span>Preview Demo Order</span>
+            </button>
+        </div>
+    </aside>
+
+    <script>
+        // Set dynamic copyright year
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Menu Data Store
+        const menuItems = [
+            {
+                id: '1',
+                name: 'Classic Zaatar Sajj',
+                category: 'Manakish',
+                price: 1.50,
+                image: 'https://images.unsplash.com/photo-1541518763669-27fef04b14da?auto=format&fit=crop&w=600&q=80',
+                description: 'Wild Lebanese thyme, toasted sesame seeds, sumac, and extra virgin olive oil on paper-thin Sajj dough.',
+                customizations: ['Extra Crispy', 'Add Veggies Side (+$0.50)']
+            },
+            {
+                id: '2',
+                name: 'Akkawi & Kashkaval Cheese',
+                category: 'Manakish',
+                price: 3.00,
+                image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
+                description: 'Melted signature blend of mild Akkawi and savory Kashkaval cheeses.',
+                customizations: ['Extra Crispy', 'Add Nigella Seeds']
+            },
+            {
+                id: '3',
+                name: 'Zaatar w/ Fresh Veggies',
+                category: 'Manakish',
+                price: 2.25,
+                image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=600&q=80',
+                description: 'Traditional Zaatar wrapped with fresh tomatoes, cucumbers, fresh mint leaves, and black olives.',
+                customizations: ['No Tomato', 'Extra Mint']
+            },
+            {
+                id: '4',
+                name: 'Lahm Bi Ajeen (Meat Sajj)',
+                category: 'Manakish',
+                price: 3.50,
+                image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80',
+                description: 'Minced spiced beef, finely chopped onions, tomatoes, and Mediterranean spices crisp-baked.',
+                customizations: ['Squeeze Lemon', 'Add Pomegranate Molasses']
+            },
+            {
+                id: '5',
+                name: 'Traditional Kishk',
+                category: 'Manakish',
+                price: 2.50,
+                image: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=600&q=80',
+                description: 'Dried bulgur & fermented yogurt paste mixed with diced onions, tomatoes, and olive oil.',
+                customizations: ['Extra Spicy']
+            },
+            {
+                id: '6',
+                name: 'Soujouk & Cheese Deluxe',
+                category: 'Specialty',
+                price: 4.50,
+                image: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=600&q=80',
+                description: 'Spicy armenian beef sausage slices with gooey melted cheese, pickles, and mayo-mustard spread.',
+                customizations: ['Extra Pickles', 'Spicy Sauce']
+            },
+            {
+                id: '7',
+                name: 'Smoked Turkey & Cheese Wrap',
+                category: 'Specialty',
+                price: 4.00,
+                image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80',
+                description: 'Premium smoked turkey breast slices, melted cheese, crisp lettuce, tomato, and mayo.',
+                customizations: ['Add Pickles', 'No Mayo']
+            },
+            {
+                id: '8',
+                name: 'Fresh Labneh w/ Olives & Mint',
+                category: 'Specialty',
+                price: 2.75,
+                image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
+                description: 'Creamy homemade strained yogurt, sliced black olives, fresh mint, cucumber, and olive oil drizzle.',
+                customizations: ['Add Zaatar Sprinkle']
+            },
+            {
+                id: '9',
+                name: 'Nutella & Banana Sweet Sajj',
+                category: 'Specialty',
+                price: 3.50,
+                image: 'https://images.unsplash.com/photo-1519676867240-f03562e64548?auto=format&fit=crop&w=600&q=80',
+                description: 'Warm, folded Sajj filled with rich Nutella hazelnut chocolate spread and fresh banana slices.',
+                customizations: ['Add Crushed Pistachios (+$0.50)']
+            },
+            {
+                id: '10',
+                name: 'Chilled Laban Ayran',
+                category: 'Drinks & Extras',
+                price: 1.25,
+                image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&w=600&q=80',
+                description: 'Refreshing traditional salted yogurt drink served ice cold.',
+                customizations: ['Add Mint']
+            },
+            {
+                id: '11',
+                name: 'Freshly Squeezed Orange Juice',
+                category: 'Drinks & Extras',
+                price: 2.00,
+                image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80',
+                description: '100% pure fresh oranges pressed right upon order.',
+                customizations: ['No Ice']
+            },
+            {
+                id: '12',
+                name: 'Hot Cardamom Black Tea',
+                category: 'Drinks & Extras',
+                price: 1.00,
+                image: 'data:image/jpeg;base64,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',
+                description: 'Traditional slow-brewed black tea infused with fragrant cardamom pods.',
+                customizations: ['With Fresh Mint']
+            }
+        ];
+
+        // State Management
+        let cart = [];
+        try {
+            const saved = JSON.parse(localStorage.getItem('al-sajj-cart'));
+            if (Array.isArray(saved)) cart = saved.filter(item => item && Number.isFinite(item.price) && Number.isInteger(item.quantity) && item.quantity > 0);
+        } catch {}
+        let activeCategory = 'All';
+        let orderType = 'Delivery'; // 'Delivery' or 'Pickup'
+
+        // Render Categories
+        function renderCategories() {
+            const categories = ['All', 'Manakish', 'Specialty', 'Drinks & Extras'];
+            const container = document.getElementById('category-filters');
+            
+            container.innerHTML = categories.map(cat => `
+                <button 
+                    onclick="filterCategory('${cat}')"
+                    class="px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${activeCategory === cat ? 'bg-terracotta-600 text-white shadow-md scale-105' : 'bg-white text-stone-700 hover:bg-stone-200 border border-stone-200'}"
+                >
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        // Render Menu Cards
+        function renderMenu() {
+            const container = document.getElementById('menu-grid');
+            const filteredItems = activeCategory === 'All' 
+                ? menuItems 
+                : menuItems.filter(item => item.category === activeCategory);
+
+            container.innerHTML = filteredItems.map(item => `
+                <div class="bg-white rounded-2xl overflow-hidden border border-stone-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
+                    <div class="relative h-48 overflow-hidden bg-stone-100">
+                        <img 
+                            src="${item.image}" 
+                            alt="${item.name}" 
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            onerror="this.onerror=null; this.src='https://placehold.co/600x400/333333/FFFFFF?text=${encodeURIComponent(item.name)}';"
+                        >
+                        <span class="absolute top-3 right-3 bg-stone-900/80 backdrop-blur-md text-amber-300 font-extrabold text-sm px-3 py-1 rounded-full shadow-md">
+                            $${item.price.toFixed(2)}
+                        </span>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-xs font-semibold text-olive-600 uppercase tracking-wider">${item.category}</span>
+                            <h3 class="text-lg font-bold text-stone-900 mt-1">${item.name}</h3>
+                            <p class="text-xs text-stone-500 leading-relaxed mt-2">${item.description}</p>
+                        </div>
+
+                        ${item.customizations && item.customizations.length > 0 ? `
+                            <div class="pt-2">
+                                <label class="text-[11px] font-bold text-stone-400 block mb-1">Option / Customization:</label>
+                                <select id="custom-${item.id}" class="w-full text-xs bg-stone-50 border border-stone-200 rounded-lg p-2 text-stone-700 focus:outline-none focus:ring-1 focus:ring-terracotta-500">
+                                    <option value="Standard">Standard Preparation</option>
+                                    ${item.customizations.map(c => `<option value="${c}">${c}</option>`).join('')}
+                                </select>
+                            </div>
+                        ` : ''}
+
+                        <button 
+                            onclick="addToCart('${item.id}')"
+                            class="w-full bg-stone-900 hover:bg-terracotta-600 text-white py-2.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md"
+                        >
+                            <i class="fa-solid fa-plus text-xs"></i> Add To Order
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter Action
+        function filterCategory(cat) {
+            activeCategory = cat;
+            renderCategories();
+            renderMenu();
+        }
+
+        // Cart Actions
+        function addToCart(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            const customSelect = document.getElementById(`custom-${itemId}`);
+            const selectedCustom = customSelect ? customSelect.value : 'Standard';
+
+            // Check if item with same customization already exists in cart
+            const existing = cart.find(ci => ci.id === itemId && ci.customization === selectedCustom);
+
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({
+                    ...item,
+                    customization: selectedCustom,
+                    quantity: 1
+                });
+            }
+
+            updateCartUI();
+            
+            // Subtle notification pulse
+            const badge = document.getElementById('cart-badge');
+            badge.classList.add('scale-125');
+            setTimeout(() => badge.classList.remove('scale-125'), 200);
+        }
+
+        function updateQuantity(index, change) {
+            cart[index].quantity += change;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartUI();
+        }
+
+        function setOrderType(type) {
+            orderType = type;
+            const btnDelivery = document.getElementById('btn-delivery');
+            const btnPickup = document.getElementById('btn-pickup');
+            const deliveryRow = document.getElementById('delivery-fee-row');
+
+            if (type === 'Delivery') {
+                btnDelivery.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white text-stone-900 shadow-sm";
+                btnPickup.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all text-stone-600 hover:text-stone-900";
+                deliveryRow.style.display = 'flex';
+            } else {
+                btnPickup.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white text-stone-900 shadow-sm";
+                btnDelivery.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all text-stone-600 hover:text-stone-900";
+                deliveryRow.style.display = 'none';
+            }
+            updateCartTotals();
+        }
+
+        // Render Cart UI
+        function updateCartUI() {
+            try { localStorage.setItem('al-sajj-cart', JSON.stringify(cart)); } catch {}
+            const container = document.getElementById('cart-items-container');
+            const badge = document.getElementById('cart-badge');
+
+            // Total count of items
+            const totalItemsCount = cart.reduce((sum, i) => sum + i.quantity, 0);
+            badge.textContent = totalItemsCount;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center p-6 text-stone-400 space-y-3">
+                        <i class="fa-solid fa-basket-shopping text-5xl text-stone-200"></i>
+                        <p class="font-medium text-stone-600">Your basket is empty</p>
+                        <p class="text-xs">Browse our delicious Sajj items and add them to your order!</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = cart.map((item, index) => `
+                    <div class="flex items-center justify-between bg-stone-50 p-3 rounded-xl border border-stone-200 gap-3">
+                        <div class="flex-grow">
+                            <h4 class="font-bold text-stone-900 text-sm">${item.name}</h4>
+                            <p class="text-[11px] text-stone-500">${item.customization}</p>
+                            <span class="text-xs font-bold text-terracotta-600">$${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                        
+                        <!-- Quantity Controller -->
+                        <div class="flex items-center gap-2 bg-white border border-stone-200 rounded-lg p-1">
+                            <button onclick="updateQuantity(${index}, -1)" class="w-6 h-6 rounded bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-700 text-xs font-bold">
+                                -
+                            </button>
+                            <span class="text-xs font-bold w-4 text-center">${item.quantity}</span>
+                            <button onclick="updateQuantity(${index}, 1)" class="w-6 h-6 rounded bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-700 text-xs font-bold">
+                                +
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateCartTotals();
+        }
+
+        function updateCartTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const deliveryFee = orderType === 'Delivery' && cart.length > 0 ? 1.50 : 0.00;
+            const grandTotal = subtotal + deliveryFee;
+
+            document.getElementById('summary-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('summary-delivery').textContent = `$${deliveryFee.toFixed(2)}`;
+            document.getElementById('summary-total').textContent = `$${grandTotal.toFixed(2)}`;
+        }
+
+        // Toggle Drawer Visibility
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('cart-overlay');
+            
+            const isOpen = !drawer.classList.contains('translate-x-full');
+
+            if (isOpen) {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            } else {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        function previewOrder() {
+            if (cart.length === 0) {
+                alert('Your basket is empty. Please add items before placing an order.');
+                return;
+            }
+
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            const notes = document.getElementById('cust-notes').value.trim();
+
+            if (!name || !phone || !address) {
+                alert('Please fill out your Name, Phone Number, and Delivery Address/Pickup Time.');
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const deliveryFee = orderType === 'Delivery' ? 1.50 : 0.00;
+            const total = subtotal + deliveryFee;
+
+            // Build Itemized WhatsApp Message
+            let msg = `*NEW SAJJ ORDER - AL-SAJJ BAKERY*\n`;
+            msg += `-----------------------------------\n`;
+            msg += `*Order Type:* ${orderType}\n\n`;
+            msg += `*ORDER ITEMS:*\n`;
+
+            cart.forEach((item, index) => {
+                msg += `${index + 1}. *${item.name}* (x${item.quantity})\n`;
+                if (item.customization && item.customization !== 'Standard') {
+                    msg += `   └ Note: ${item.customization}\n`;
+                }
+                msg += `   └ Price: $${(item.price * item.quantity).toFixed(2)}\n`;
+            });
+
+            msg += `\n-----------------------------------\n`;
+            msg += `*Subtotal:* $${subtotal.toFixed(2)}\n`;
+            if (orderType === 'Delivery') {
+                msg += `*Delivery Fee:* $${deliveryFee.toFixed(2)}\n`;
+            }
+            msg += `*GRAND TOTAL:* $${total.toFixed(2)}\n`;
+            msg += `-----------------------------------\n\n`;
+
+            msg += `*CUSTOMER DETAILS:*\n`;
+            msg += `👤 *Name:* ${name}\n`;
+            msg += `📞 *Phone:* ${phone}\n`;
+            msg += `📍 *${orderType === 'Delivery' ? 'Address' : 'Pickup Time'}:* ${address}\n`;
+            if (notes) {
+                msg += `📝 *Notes:* ${notes}\n`;
+            }
+
+            const preview = document.getElementById('order-preview');
+            preview.querySelector('pre').textContent = msg;
+            preview.showModal();
+        }
+
+        // Initialize App on Load
+        window.onload = function() {
+            renderCategories();
+            renderMenu();
+            updateCartUI();
+        };
+    </script>
+    <dialog id="order-preview" class="w-[min(92vw,34rem)] rounded-xl p-5 shadow-xl backdrop:bg-black/50">
+        <h2 class="text-lg font-bold">Demo order preview</h2>
+        <p class="my-2">No order is sent. Use sample contact details.</p>
+        <pre class="whitespace-pre-wrap max-h-[55vh] overflow-auto rounded bg-stone-100 p-3"></pre>
+        <form method="dialog" class="mt-4"><button class="rounded bg-stone-900 px-4 py-2 text-white">Close</button></form>
+    </dialog>
+</body>
+</html>

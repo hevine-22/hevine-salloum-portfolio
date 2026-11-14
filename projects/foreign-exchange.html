@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foreign Exchange & Multi-API Converter</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #38bdf8;
+      --text-color: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --error-color: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      color: var(--accent-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.8rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .converter-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .converter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    input, select {
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent-color);
+    }
+
+    .swap-btn {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--accent-color);
+      padding: 0.75rem;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-end;
+      margin-bottom: 0.2rem;
+      transition: background-color 0.2s;
+    }
+
+    .swap-btn:hover {
+      background-color: var(--border-color);
+    }
+
+    .result-box {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: var(--bg-color);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .result-box p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .result-box h3 {
+      font-size: 1.8rem;
+      color: var(--accent-color);
+      margin-top: 0.3rem;
+    }
+
+    .error-msg {
+      color: var(--error-color) !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Foreign Exchange Market</h1>
+      <p style="color: var(--text-muted);">Real-time global currency conversion engine</p>
+    </header>
+
+    <!-- Info Card -->
+    <section class="card">
+      <h2 style="color: var(--accent-color); margin-bottom: 0.8rem;">How Foreign Exchange Works</h2>
+      <p style="color: var(--text-muted); margin-bottom: 0.5rem;">
+        Foreign Exchange (Forex) is the decentralized marketplace where currencies are traded globally. Conversion rates represent the price ratio of one currency relative to another.
+      </p>
+    </section>
+
+    <!-- Converter Card -->
+    <section class="card">
+      <h2 style="color: var(--accent-color); margin-bottom: 0.5rem;">Live Currency Converter</h2>
+
+      <div class="converter-grid">
+        <div class="form-group">
+          <label for="amount">Amount</label>
+          <input type="number" id="amount" value="100" min="0" step="any">
+          
+          <label for="from-currency" style="margin-top: 0.5rem;">From</label>
+          <select id="from-currency"><option>Loading currencies...</option></select>
+        </div>
+
+        <button class="swap-btn" id="swap-btn" title="Swap Currencies">⇄</button>
+
+        <div class="form-group" style="grid-column: 3 / 4;">
+          <label for="to-currency" style="margin-top: 2.2rem;">To</label>
+          <select id="to-currency"><option>Loading currencies...</option></select>
+        </div>
+      </div>
+
+      <div class="result-box">
+        <p id="rate-info">Fetching market rates...</p>
+        <h3 id="converted-amount">---</h3>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const amountInput = document.getElementById('amount');
+    const fromSelect = document.getElementById('from-currency');
+    const toSelect = document.getElementById('to-currency');
+    const swapBtn = document.getElementById('swap-btn');
+    const convertedAmountEl = document.getElementById('converted-amount');
+    const rateInfoEl = document.getElementById('rate-info');
+
+    // Default Fallback Currency Dictionary (Ensures options exist even if API fails)
+    const fallbackCurrencies = {
+      "USD": "United States Dollar",
+      "EUR": "Euro",
+      "GBP": "British Pound",
+      "JPY": "Japanese Yen",
+      "CAD": "Canadian Dollar",
+      "AUD": "Australian Dollar",
+      "CHF": "Swiss Franc",
+      "CNY": "Chinese Yuan",
+      "SAR": "Saudi Riyal",
+      "AED": "UAE Dirham",
+      "LBP": "Lebanese Pound",
+      "EGP": "Egyptian Pound",
+      "INR": "Indian Rupee"
+    };
+
+    let activeCurrencies = {};
+
+    // Load Currencies with Multi-API Fallback Strategy
+    async function initCurrencies() {
+      try {
+        // Primary API: ExchangeRate-API open endpoint
+        const res = await fetch('https://open.er-api.com/v6/latest/USD');
+        if (!res.ok) throw new Error('Primary API unavailable');
+        const data = await res.json();
+        
+        // Extract currency codes from rate keys
+        activeCurrencies = {};
+        Object.keys(data.rates).forEach(code => {
+          activeCurrencies[code] = code;
+        });
+      } catch (err) {
+        console.warn('Primary API failed, trying secondary Frankfurter API...', err);
+        try {
+          // Secondary API: Frankfurter
+          const res = await fetch('https://api.frankfurter.app/currencies');
+          if (!res.ok) throw new Error('Secondary API unavailable');
+          activeCurrencies = await res.json();
+        } catch (err2) {
+          console.warn('Secondary API failed. Loading offline fallback list.', err2);
+          activeCurrencies = fallbackCurrencies;
+        }
+      }
+
+      populateDropdowns();
+      convertCurrency();
+    }
+
+    function populateDropdowns() {
+      fromSelect.innerHTML = '';
+      toSelect.innerHTML = '';
+
+      const codes = Object.keys(activeCurrencies).sort();
+
+      codes.forEach(code => {
+        const name = activeCurrencies[code];
+        const label = name !== code ? `${code} - ${name}` : code;
+
+        const optFrom = new Option(label, code);
+        const optTo = new Option(label, code);
+
+        fromSelect.add(optFrom);
+        toSelect.add(optTo);
+      });
+
+      // Set sensible defaults
+      fromSelect.value = codes.includes('USD') ? 'USD' : codes[0];
+      toSelect.value = codes.includes('EUR') ? 'EUR' : codes[1] || codes[0];
+    }
+
+    // Perform Exchange Calculation with Multiple Fallbacks
+    let conversionVersion = 0;
+    let amountTimer;
+
+    async function convertCurrency() {
+      clearTimeout(amountTimer);
+      const version = ++conversionVersion;
+      const amount = parseFloat(amountInput.value);
+      const from = fromSelect.value;
+      const to = toSelect.value;
+
+      rateInfoEl.classList.remove('error-msg');
+
+      if (isNaN(amount) || amount <= 0) {
+        convertedAmountEl.innerText = '0.00';
+        rateInfoEl.innerText = 'Please enter a valid amount.';
+        return;
+      }
+
+      if (from === to) {
+        convertedAmountEl.innerText = `${amount.toLocaleString()} ${to}`;
+        rateInfoEl.innerText = `1 ${from} = 1 ${to}`;
+        return;
+      }
+
+      rateInfoEl.innerText = 'Calculating exchange rate...';
+
+      // 1. Try Open Exchange Rate API Endpoint
+      try {
+        const res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
+        if (!res.ok) throw new Error('API Rate Error');
+        const data = await res.json();
+        
+        const rate = data.rates[to];
+        if (version !== conversionVersion) return;
+        if (rate) {
+          displayResult(amount, rate, from, to);
+          return;
+        }
+      } catch (e) {
+        console.warn('Primary rate fetch failed, trying secondary...', e);
+      }
+
+      if (version !== conversionVersion) return;
+
+      // 2. Fallback to Frankfurter API
+      try {
+        const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`);
+        if (!res.ok) throw new Error('Frankfurter Rate Error');
+        const data = await res.json();
+        
+        if (version !== conversionVersion) return;
+        const converted = data.rates?.[to];
+        if (!Number.isFinite(converted)) throw new Error("Rate unavailable");
+        const unitRate = (converted / amount).toFixed(4);
+
+        convertedAmountEl.innerText = `${converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${to}`;
+        rateInfoEl.innerText = `1 ${from} = ${unitRate} ${to}`;
+        return;
+      } catch (e) {
+        console.warn('Secondary rate fetch failed.', e);
+      }
+
+      if (version !== conversionVersion) return;
+      // If all fails
+      rateInfoEl.innerText = 'Unable to fetch exchange rates at this moment. Check network connection.';
+      rateInfoEl.classList.add('error-msg');
+      convertedAmountEl.innerText = '---';
+    }
+
+    function displayResult(amount, rate, from, to) {
+      const total = (amount * rate).toFixed(2);
+      convertedAmountEl.innerText = `${Number(total).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${to}`;
+      rateInfoEl.innerText = `1 ${from} = ${rate.toFixed(4)} ${to}`;
+    }
+
+    // Event Listeners
+    amountInput.addEventListener('input', () => {
+      ++conversionVersion;
+      clearTimeout(amountTimer);
+      amountTimer = setTimeout(convertCurrency, 300);
+    });
+    fromSelect.addEventListener('change', convertCurrency);
+    toSelect.addEventListener('change', convertCurrency);
+
+    swapBtn.addEventListener('click', () => {
+      const temp = fromSelect.value;
+      fromSelect.value = toSelect.value;
+      toSelect.value = temp;
+      convertCurrency();
+    });
+
+    // Initialize application
+    initCurrencies();
+  </script>
+
+</body>
+</html>
